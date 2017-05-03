@@ -17,6 +17,15 @@
       "maximumInstanceCount": {
          "value": 100
       },
+      "resourceGroupDatabase": {
+         "value": "existingdb"
+      },
+      "virtualNetworkNameDatabase": {
+         "value": "existingdb-vnet"
+      },
+      "subnetNameDatabase": {
+         "value": "default"
+      },
       "databaseType": {
          "value": "MSSQLS"
       },

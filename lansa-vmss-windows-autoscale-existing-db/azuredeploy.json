@@ -197,12 +197,9 @@
       "saCount": "[length(variables('uniqueStringArray'))]",
       "vhdContainerName": "[concat(variables('namingInfix'), 'vhd')]",
       "osDiskName": "[concat(variables('namingInfix'), 'osdisk')]",
-      "publicIPAddressName": "[concat(variables('namingInfix'), 'pip')]",
-      "dbpublicIPAddressName": "[concat(variables('namingInfix'), 'dbpip')]",
+      "subnetRef": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', parameters('resourceGroupDatabase'), '/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkNameDatabase'), '/subnets/', parameters('subnetNameDatabase'))]",
       "loadBalancerName": "[concat(variables('namingInfix'), 'lb')]",
       "dbloadBalancerName": "[concat(variables('namingInfix'), 'dblb')]",
-      "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
-      "dbpublicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('dbpublicIPAddressName'))]",
       "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName'))]",
       "dblbID": "[resourceId('Microsoft.Network/loadBalancers',variables('dbloadBalancerName'))]",
       "natPoolName": "[concat(variables('namingInfix'), 'natpool')]",
@@ -259,33 +256,19 @@
          }
       },
       {
-         "type": "Microsoft.Network/publicIPAddresses",
-         "name": "[variables('publicIPAddressName')]",
-         "location": "[resourceGroup().location]",
-         "apiVersion": "2016-03-30",
-         "properties": {
-            "publicIPAllocationMethod": "Dynamic",
-            "dnsSettings": {
-               "domainNameLabel": "[variables('longNamingInfix')]"
-            }
-         }
-      },
-      {
          "type": "Microsoft.Network/loadBalancers",
          "name": "[variables('loadBalancerName')]",
          "location": "[resourceGroup().location]",
          "apiVersion": "2016-03-30",
-         "dependsOn": [
-            "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
-         ],
          "properties": {
             "frontendIPConfigurations": [
                {
                   "name": "LoadBalancerFrontEnd",
                   "properties": {
-                     "publicIPAddress": {
-                        "id": "[variables('publicIPAddressID')]"
-                     }
+                     "subnet": {
+                        "id": "[variables('subnetRef')]"
+                     },
+                     "privateIPAllocationMethod": "Dynamic"
                   }
                }
             ],
@@ -345,33 +328,19 @@
          }
       },
       {
-         "type": "Microsoft.Network/publicIPAddresses",
-         "name": "[variables('dbpublicIPAddressName')]",
-         "location": "[resourceGroup().location]",
-         "apiVersion": "2016-03-30",
-         "properties": {
-            "publicIPAllocationMethod": "Dynamic",
-            "dnsSettings": {
-               "domainNameLabel": "[variables('dblongNamingInfix')]"
-            }
-         }
-      },
-      {
          "type": "Microsoft.Network/loadBalancers",
          "name": "[variables('dbloadBalancerName')]",
          "location": "[resourceGroup().location]",
          "apiVersion": "2016-03-30",
-         "dependsOn": [
-            "[concat('Microsoft.Network/publicIPAddresses/', variables('dbpublicIPAddressName'))]"
-         ],
          "properties": {
             "frontendIPConfigurations": [
                {
                   "name": "LoadBalancerFrontEnd",
                   "properties": {
-                     "publicIPAddress": {
-                        "id": "[variables('dbpublicIPAddressID')]"
-                     }
+                     "subnet": {
+                        "id": "[variables('subnetRef')]"
+                     },
+                     "privateIPAllocationMethod": "Dynamic"
                   }
                }
             ],
@@ -475,7 +444,7 @@
                                  "name": "[concat( 'db',variables('ipConfigName'))]",
                                  "properties": {
                                     "subnet": {
-                                       "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', parameters('resourceGroupDatabase'), '/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkNameDatabase'), '/subnets/', parameters('subnetNameDatabase'))]"
+                                       "id": "[variables('subnetRef')]"
                                     },
                                     "loadBalancerBackendAddressPools": [
                                        {
@@ -573,7 +542,7 @@
                                  "name": "[variables('ipConfigName')]",
                                  "properties": {
                                     "subnet": {
-                                       "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', parameters('resourceGroupDatabase'), '/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkNameDatabase'), '/subnets/', parameters('subnetNameDatabase'))]"
+                                       "id": "[variables('subnetRef')]"
                                     },
                                     "loadBalancerBackendAddressPools": [
                                        {
@@ -681,17 +650,21 @@
       }
    ],
    "outputs": {
-      "lbFqdn": {
-         "type": "string",
-         "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]"
+      "lbIPAddress": {
+         "type": "object",
+         "value": "[reference(variables('lbID')).frontendIPConfigurations[0]]"
       },
-      "dbrdpAddress": {
-         "type": "string",
-         "value": "[concat(reference(variables('dbpublicIPAddressName')).dnsSettings.fqdn, ':50000')]"
+      "lbIPAddress2": {
+         "type": "object",
+         "value": "[reference(variables('lbID')).frontendIPConfigurations[0].privateIPAddress]"
       },
-      "rdpAddress": {
+      "lbIPAddress3": {
          "type": "string",
-         "value": "[concat(reference(variables('publicIPAddressName')).dnsSettings.fqdn, ':50000')]"
+         "value": "[reference(variables('lbID')).frontendIPConfigurations[0].privateIPAddress]"
+      },
+      "lbIPAddress4": {
+         "type": "object",
+         "value": "[reference(variables('lbID'))]"
       }
    }
 }

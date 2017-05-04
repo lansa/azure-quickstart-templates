@@ -9,7 +9,7 @@
          "value": "Standard_A2"
       },
       "stackName": {
-         "value": "GEN-UNIQUE"
+         "value": "mystack"
       },
       "minimumInstanceCount": {
          "value": 1
@@ -30,7 +30,7 @@
          "value": "MSSQLS"
       },
       "databaseServerName": {
-         "value": "GEN-UNIQUE"
+         "value": "existingdb"
       },
       "databaseName": {
          "value": "lansadb"

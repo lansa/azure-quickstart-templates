@@ -212,7 +212,7 @@
       "natBackendPort": 3389,
       "nicName": "[concat(variables('namingInfix'), 'nic')]",
       "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
-      "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
+      "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/MainLoadBalancerFrontEnd')]",
       "imagePublisher": "lansa",
       "imageSku": "lansa-scalable-license-14-1",
       "imageOffer": "lansa-scalable-license",
@@ -263,7 +263,7 @@
          "properties": {
             "frontendIPConfigurations": [
                {
-                  "name": "LoadBalancerFrontEnd",
+                  "name": "MainLoadBalancerFrontEnd",
                   "properties": {
                      "subnet": {
                         "id": "[variables('subnetRef')]"
@@ -335,7 +335,7 @@
          "properties": {
             "frontendIPConfigurations": [
                {
-                  "name": "LoadBalancerFrontEnd",
+                  "name": "DatabaseLoadBalancerFrontEnd",
                   "properties": {
                      "subnet": {
                         "id": "[variables('subnetRef')]"
@@ -354,7 +354,7 @@
                   "name": "lbrule",
                   "properties": {
                      "frontendIPConfiguration": {
-                        "id": "[concat(variables('dblbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]"
+                        "id": "[concat(variables('dblbID'),'/frontendIPConfigurations/DatabaseLoadBalancerFrontEnd')]"
                      },
                      "backendAddressPool": {
                         "id": "[concat(variables('dblbID'), '/backendAddressPools/', variables('dbbePoolName'))]"
@@ -650,21 +650,21 @@
       }
    ],
    "outputs": {
-      "lbIPAddress": {
-         "type": "object",
-         "value": "[reference(variables('lbID')).frontendIPConfigurations[0]]"
-      },
-      "lbIPAddress2": {
-         "type": "object",
-         "value": "[reference(variables('lbID')).frontendIPConfigurations[0].privateIPAddress]"
-      },
-      "lbIPAddress3": {
+      "lbName": {
          "type": "string",
-         "value": "[reference(variables('lbID')).frontendIPConfigurations[0].privateIPAddress]"
+         "value": "[reference(variables('lbID')).frontendIPConfigurations[0].name]"
       },
-      "lbIPAddress4": {
-         "type": "object",
-         "value": "[reference(variables('lbID'))]"
+      "lbIPAddress": {
+         "type": "string",
+         "value": "[reference(variables('lbID')).frontendIPConfigurations[0].properties.privateIPAddress]"
+      },
+      "dblbName": {
+         "type": "string",
+         "value": "[reference(variables('dblbID')).frontendIPConfigurations[0].name]"
+      },
+      "dblbIPAddress": {
+         "type": "string",
+         "value": "[reference(variables('dblbID')).frontendIPConfigurations[0].properties.privateIPAddress]"
       }
    }
 }

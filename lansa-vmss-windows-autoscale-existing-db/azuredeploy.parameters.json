@@ -30,7 +30,7 @@
          "value": "MSSQLS"
       },
       "databaseServerName": {
-         "value": ""
+         "value": "GEN-UNIQUE"
       },
       "databaseName": {
          "value": "lansadb"

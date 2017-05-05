@@ -31,7 +31,6 @@
       <Visible>False</Visible>
     </None>
     <None Include="metadata.json" />
-    <None Include="nars.json" />
     <None Include="README.md" />
     <None Include="Scripts\Deploy-AzureResourceGroup.ps1" />
   </ItemGroup>

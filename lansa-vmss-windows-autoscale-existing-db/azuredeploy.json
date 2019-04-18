@@ -240,7 +240,7 @@
       "agSubnetName": "[concat(variables('namingInfix'), '-agsubnet')]",
       "agSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('agsubnetName'))]",
       "agName": "[concat(variables('namingInfix'), '-ag')]",
-      "agID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('agName'))]",
+      "agID": "[resourceId('Microsoft.Network/applicationgateways',variables('agName'))]",
       "agBackendAddressPoolName": "[concat(variables('namingInfix'), '-agpool')]"
    },
    "resources": [
@@ -783,7 +783,7 @@
                         "id": "[concat(variables('agID'), '/httpListeners/appGatewayHttpListener')]"
                      },
                      "backendAddressPool": {
-                        "id": "[concat(variables('agID'), '/backendAddressPools/appGatewayBackendPool')]"
+                        "id": "[concat(variables('agID'), '/backendAddressPools/', variables('agBackendAddressPoolName'))]"
                      },
                      "backendHttpSettings": {
                         "id": "[concat(variables('agID'), '/backendHttpSettingsCollection/appGatewayBackendHttpSettings')]"

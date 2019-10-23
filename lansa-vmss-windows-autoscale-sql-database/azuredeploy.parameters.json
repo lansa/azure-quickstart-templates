@@ -3,34 +3,34 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmssName": {
-            "value": "GEN-UNIQUE-10"
+            "value": "newexist7"
         },
         "certificateBase64Encoded": {
-            "value" : "GEN-SELFSIGNED-CERT-PFXDATA"
+            "value" : "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"
         },
         "certificatePassword": {
-            "value": "GEN-SELFSIGNED-CERT-PASSWORD"
+            "value": "Pcxuser@122robg"
         },
         "databaseName": {
             "value": "lansa"
         },
         "databaseLogin": {
-            "value": "GEN-UNIQUE-10"
+            "value": "lansa"
         },
         "databaseLoginPassword": {
-            "value": "GEN-PASSWORD"
+            "value": "Pcxuser@122robg"
         },
         "adminUsername": {
-            "value": "GEN_UNIQUE-10"
+            "value": "lansa"
         },
         "adminPassword": {
-            "value": "GEN-PASSWORD"
+            "value": "Pcxuser@122robg"
         },
         "webUsername": {
-            "value": "GEN_UNIQUE-10"
+            "value": "PCXUSER2"
         },
         "webPassword": {
-            "value": "GEN-PASSWORD"
+            "value": "Pcxuser@122robg"
         },
         "webServerMaxConnect": {
             "value": "20"

@@ -256,7 +256,7 @@
       },
       "imageOffer": {
          "type": "string",
-         "defaultValue": "lansa-scalable-license",
+         "defaultValue": "lansa-scalable-license-preview",
          "allowedValues": [
             "lansa-scalable-license",
             "lansa-scalable-license-preview"

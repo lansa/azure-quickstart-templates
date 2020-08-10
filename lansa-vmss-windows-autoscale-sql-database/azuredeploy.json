@@ -732,7 +732,7 @@
       },
       {
          "type": "Microsoft.Insights/autoscaleSettings",
-         "apiVersion": "2015-04-01",
+         "apiVersion": "2014-04-01",
          "name": "autoscalehost",
          "location": "[parameters('location')]",
          "dependsOn": [
@@ -764,8 +764,8 @@
                         },
                         "scaleAction": {
                            "direction": "Increase",
-                           "type": "PercentChangeCount",
-                           "value": "10",
+                           "type": "ChangeCount",
+                           "value": 10,
                            "cooldown": "PT20M"
                         }
                      },
@@ -783,7 +783,7 @@
                         "scaleAction": {
                            "direction": "Decrease",
                            "type": "ChangeCount",
-                           "value": "1",
+                           "value": 1,
                            "cooldown": "PT20M"
                         }
                      }
@@ -794,7 +794,7 @@
       },
       {
          "type": "Microsoft.Insights/autoscaleSettings",
-         "apiVersion": "2015-04-01",
+         "apiVersion": "2014-04-01",
          "name": "[variables('dbvmssName')]",
          "location": "[parameters('location')]",
          "dependsOn": [
@@ -808,9 +808,9 @@
                {
                   "name": "Single Fixed Instance",
                   "capacity": {
-                     "minimum": "1",
-                     "maximum": "1",
-                     "default": "1"
+                     "minimum": 1,
+                     "maximum": 1,
+                     "default": 1
                   }
                }
             ]
@@ -945,7 +945,7 @@
          "tags": {
             "displayName": "SqlServer"
          },
-         "apiVersion": "2018-06-01-preview",
+         "apiVersion": "2019-06-01-preview",
          "properties": {
             "administratorLogin": "[parameters('databaseLogin')]",
             "administratorLoginPassword": "[parameters('databaseLoginPassword')]",
@@ -960,7 +960,7 @@
                "tags": {
                   "displayName": "Database"
                },
-               "apiVersion": "2018-06-01-preview",
+               "apiVersion": "2019-06-01-preview",
                "dependsOn": [
                   "[variables('sqlserverName')]"
                ],
@@ -974,7 +974,7 @@
             {
                "condition": "[equals(parameters('databaseNewOrExisting'), 'new')]",
                "type": "firewallRules",
-               "apiVersion": "2018-06-01-preview",
+               "apiVersion": "2015-05-01-preview",
                "dependsOn": [
                   "[variables('sqlserverName')]"
                ],

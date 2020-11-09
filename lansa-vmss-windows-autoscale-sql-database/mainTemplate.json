@@ -93,12 +93,12 @@
       },
       "applicationGatewaySkuTier": {
          "type": "string",
-        "allowedValues": [
-          "Standard",
-          "Standard V2",
-          "WAF",
-          "WAF V2"
-        ],
+         "allowedValues": [
+            "Standard",
+            "Standard V2",
+            "WAF",
+            "WAF V2"
+         ],
          "defaultValue": "Standard",
          "metadata": {
             "description": "Application Gateway SKU Tier"

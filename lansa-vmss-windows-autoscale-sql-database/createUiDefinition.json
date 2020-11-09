@@ -123,11 +123,11 @@
                 "label": "Minimum Instance Count",
                 "toolTip": "Minimum number of Virtual Machine instances (1 or more).",
                 "defaultValue": "[int('1')]",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[1-9][0-9]?$|^100$",
-                    "validationMessage": "Only numerals are allowed. The value must be from 1-100."
-                }
+              "constraints": {
+                "required": true,
+                "regex": "^[1-9][0-9]?$|^100$",
+                "validationMessage": "Only numerals are allowed. The value must be from 1-100."
+              }
             },
             {
                 "name": "maximumInstanceCount",
@@ -135,11 +135,11 @@
                 "label": "Maximum Instance Count",
                 "toolTip": "Maximum number of Virtual Machine instances (100 or less).",
                 "defaultValue": "[int('100')]",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[1-9][0-9]?$|^100$",
-                    "validationMessage": "Only numerals are allowed. The value must be from 1-100."
-                }
+              "constraints": {
+                "required": true,
+                "regex": "^[1-9][0-9]?$|^100$",
+                "validationMessage": "Only numerals are allowed. The value must be from 1-100."
+              }
             },
             {
                 "name": "webServerMaxConnect",
@@ -527,16 +527,24 @@
                         "defaultValue": "Standard",
                         "constraints": {
                             "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "Standard",
-                                    "value": "Standard"
-                                },
-                                {
-                                    "label": "WAF",
-                                    "value": "WAF"
-                                }
-                            ]
+                          "allowedValues":[
+                            {
+                              "label": "Standard",
+                              "value": "Standard"
+                            },
+                            {
+                              "label": "Standard V2",
+                              "value": "Standard V2"
+                            },
+                            {
+                              "label": "WAF",
+                              "value": "WAF"
+                            },
+                            {
+                              "label": "WAF V2",
+                              "value": "WAF V2"
+                            }
+                          ]
                         }
                     },
                     {

@@ -91,6 +91,38 @@
          "minLength" : 3,
          "maxLength": 61
       },
+      "publicIpNewOrExisting": {
+      "type": "string",
+      "defaultValue": "new",
+      "metadata": {
+        "description": "Determines whether or not a new public ip should be provisioned."
+      }
+    },
+    "publicIpName": {
+      "type": "string",
+      "defaultValue": "PublicIp",
+      "metadata": {
+        "description": "Name of the public ip address"
+      }
+    },
+	 "publicIpResourceGroupName": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "metadata": {
+        "description": "Name of the resource group for the public ip address"
+      }
+    },
+    "publicIpAllocationMethod": {
+      "type": "string",
+      "defaultValue": "Dynamic",
+      "allowedValues": [
+        "Dynamic",
+        "Static"
+      ],
+      "metadata": {
+        "description": "Allocation method for the public ip address"
+      }
+	  },
       "applicationGatewaySkuTier": {
          "type": "string",
          "allowedValues": [
@@ -828,6 +860,11 @@
                                        {
                                           "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', variables('agName'), variables('agBackendAddressPoolName'))]"
                                        }
+                                    ],
+                                    "publicIpAddressId": [
+                                       {
+                                          "id": "[resourceId(parameters('publicIpResourceGroupName'), 'Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]"
+                                       }
                                     ]
                                  }
                               }
@@ -1117,7 +1154,20 @@
                }
             }
          ]
+      },
+       {
+      "condition": "[equals(parameters('publicIpNewOrExisting'), 'new')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('publicIpName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('publicIpSku')]"
       }
+	  },
+       {
+      "publicIPAllocationMethod": "[parameters('publicIpAllocationMethod')]"
+       }   
    ],
    "outputs": {
       "dbServerName": {

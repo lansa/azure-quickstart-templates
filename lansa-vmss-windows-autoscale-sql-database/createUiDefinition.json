@@ -519,6 +519,32 @@
                 },
                 "bladeTitle": "Application Gateway",
                 "elements": [
+                    
+                    {
+                        "name": "publicIpAddress",
+                        "type": "Microsoft.Network.PublicIpAddressCombo",
+                        "label": {
+                            "publicIpAddress": "Public IP Address for the AG",
+                            "domainNameLabel": "AG public IP Address"
+                        },
+                        "toolTip": {
+                            "publicIpAddress": "Public IP Address for the AG",
+                            "domainNameLabel": "AG public IP Address"
+                        },
+                        "defaultValue": {
+                            "publicIpAddressName": "[concat(basics('stackName'), '-ip')]",
+                            "domainNameLabel": "[concat(basics('stackName'), 'existing-ip-', take(replace(guid(), '-', ''), 10))]"
+                        },
+                        "options": {
+                            "hideExisting": false,
+                            "hideNone": false
+                        },
+                        "constraints": {
+                            "required": {
+                                "domainNameLabel": true
+                            }
+                        }
+                    },
                     {
                         "name": "applicationGatewaySkuTier",
                         "type": "Microsoft.Common.DropDown",
@@ -816,6 +842,7 @@
             "maxSizeBytes": "[steps('DatabaseConfig').maxSizeBytes]",
             "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
             "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
+            "publicIpNewOrExisting": "[steps('applicationGatewayConfig').publicIpAddress.newOrExistingOrNone]",
             "applicationGatewaySkuTier": "[steps('applicationGatewayConfig').applicationGatewaySkuTier]",
             "applicationGatewaySkuName": "[coalesce(steps('applicationGatewayConfig').applicationGatewaySkuNameStandard, steps('applicationGatewayConfig').applicationGatewaySkuNameWAF)]",
             "applicationGatewayCapacity": "[int(coalesce(steps('applicationGatewayConfig').applicationGatewayCapacity, 2))]",

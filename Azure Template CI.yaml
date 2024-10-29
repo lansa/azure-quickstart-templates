@@ -79,15 +79,16 @@ jobs:
       failOnStderr: true
       pwsh: true
 
-  - task: AzureResourceManagerTemplateDeployment@3
+  - task: AzurePowerShell@5
     displayName: Delete resource group $(resourcegroup)
-    condition: succeeded()
     inputs:
-      deploymentScope: 'Resource Group'
-      ConnectedServiceName: $(ConnectedServiceName)
-      action: 'DeleteRG'
-      resourceGroupName: $(resourcegroup)
-    continueOnError: true
+      azureSubscription: 'Azure Baking Images'
+      ScriptType: InlineScript
+      Inline: |
+        Write-Host Deleting Resource Group $(resourcegroup)
+        Remove-AzResourceGroup -Name $(resourcegroup) -Force -ErrorAction SilentlyContinue
+      errorActionPreference: silentlyContinue
+      azurePowerShellVersion: LatestVersion
 
   - task: AzureResourceManagerTemplateDeployment@3
     displayName: 'Deploy ARM Template : BakingDP-TemplateTest'

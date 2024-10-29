@@ -82,10 +82,18 @@
                 "type": "Microsoft.Common.DropDown",
                 "label": "OS Name",
                 "toolTip": "Choose the Windows Server image version to use",
-                "defaultValue": "Windows Server 2019",
+                "defaultValue": "Windows Server 2022",
                 "constraints": {
                     "required": true,
                     "allowedValues":[
+                        {
+                            "label": "Windows Server 2022",
+                            "value": "Windows Server 2022"
+                        },
+                        {
+                            "label": "Windows Server 2022 JPN",
+                            "value": "Windows Server 2022 JPN"
+                        },
                         {
                             "label": "Windows Server 2019",
                             "value": "Windows Server 2019"
@@ -336,7 +344,7 @@
             "maxSizeBytes": "107374182400",
             "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
             "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
-            "applicationGatewaySkuTier": "Standard",
+            "applicationGatewaySkuTier": "Standard_v2",
             "applicationGatewaySkuName": "Standard_Small",
             "applicationGatewayCapacity": 2
         }

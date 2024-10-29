@@ -99,7 +99,6 @@
          "type": "string",
          "allowedValues": [
             "Standard_v2",
-            "WAF",
             "WAF_v2"
          ],
          "defaultValue": "Standard_v2",

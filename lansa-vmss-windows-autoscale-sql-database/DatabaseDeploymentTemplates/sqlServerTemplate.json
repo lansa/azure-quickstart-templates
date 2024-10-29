@@ -212,7 +212,7 @@
             "dependsOn": [
                 "managedDiskResources",
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('diagnosticsStorageAccountName'))]"
+                "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('diagnosticsStorageAccountName')))]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -269,13 +269,13 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[concat('https://', parameters('diagnosticsStorageAccountName'), '.blob.core.windows.net/')]"
+                        "storageUri": "[concat('https://', toLower(parameters('diagnosticsStorageAccountName')), '.blob.core.windows.net/')]"
                     }
                 }
             }
         },
         {
-            "name": "[parameters('diagnosticsStorageAccountName')]",
+            "name": "[toLower(parameters('diagnosticsStorageAccountName'))]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[parameters('location')]",

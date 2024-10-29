@@ -15,6 +15,8 @@ variables:
   value: AzTemplateToolKit.zip
 - name: ttk.folder
   value: $(Agent.BuildDirectory)\test
+- name: resourcegroup
+  value: 'BakingDP-Templates-CI-Test'
 
 trigger: none
 
@@ -51,6 +53,7 @@ jobs:
 
         Get-ChildItem "$(ttk.folder)" -Recurse
       pwsh: true
+
   - task: PowerShell@2
     displayName: Get Folder
     enabled: False
@@ -65,6 +68,7 @@ jobs:
         Write-Host "##vso[task.setvariable variable=sample.folder]$fullpath"
 
       pwsh: true
+
   - task: PowerShell@2
     displayName: Run Best Practice Tests
     enabled: False
@@ -74,26 +78,39 @@ jobs:
       errorActionPreference: continue
       failOnStderr: true
       pwsh: true
+
+  - task: AzurePowerShell@5
+    displayName: Delete resource group $(resourcegroup)
+    inputs:
+      azureSubscription: 'Azure Baking Images'
+      ScriptType: InlineScript
+      Inline: |
+        Write-Host Deleting Resource Group $(resourcegroup)
+        Remove-AzResourceGroup -Name $(resourcegroup) -Force -ErrorAction SilentlyContinue
+      errorActionPreference: silentlyContinue
+      azurePowerShellVersion: LatestVersion
+
   - task: AzureResourceManagerTemplateDeployment@3
     displayName: 'Deploy ARM Template : BakingDP-TemplateTest'
     condition: or(succeeded(), eq(variables['ForceDeploy'], 'True'))
     inputs:
       ConnectedServiceName: $(ConnectedServiceName)
       subscriptionName: 739c4e86-bd75-4910-8d6e-d7eb23ab94f3
-      resourceGroupName: BakingDP-TemplateTest-$(Build.BuildNumber)
+      resourceGroupName: $(resourcegroup)
       location: Australia East
       csmFile: lansa-vmss-windows-autoscale-sql-database/mainTemplate.json
       overrideParameters: -osName "Windows Server 2012" -lansaVersion "V14 SP2" -msiURL $(msiURLv142) -stackName "build-$(Build.BuildNumber)" -certificateBase64Encoded "$(certificateBase64Encoded)" -certificatePassword "$(certificatePassword)" -databaseLogin "$(databaseLogin)" -databaseLoginPassword "$(databaseLoginPassword)" -adminUsername "$(adminUsername)" -adminPassword "$(adminPassword)" -webUsername "$(webUsername)" -webPassword "$(webPassword)" -gitBranch "debug/paas" -agpublicIpSku Standard -agpublicIpAllocationMethod Static
       deploymentName: TestTemplate
       deploymentOutputs: deploymentOutput
       addSpnToEnvironment: true
+      
   - task: maikvandergaag.maikvandergaag-azurergtag.azurergtag.azurergtag@1
     displayName: Azure Resource Group Tagging
     condition: always()
     continueOnError: True
     inputs:
       ConnectedServiceName: $(ConnectedServiceName)
-      ResourceGroupName: BakingDP-TemplateTest-$(Build.BuildNumber)
+      ResourceGroupName: $(resourcegroup)
       Key: Usage
       Value: test-temp
   - task: PowerShell@2
@@ -196,7 +213,7 @@ jobs:
          # Execute the TestImageVersion PS Script
         Write-Host "Test the image version $SkuName by executing the script in the VMSS $vmssName" | Out-Default | Write-Verbose
 
-        $result = Invoke-AzVmssVMRunCommand -ResourceGroupName "BakingDP-TemplateTest-$(Build.BuildNumber)" -VMScaleSetName $vmssName -InstanceId '0' -CommandId 'RunPowerShellScript' -ScriptPath "$(Build.Repository.LocalPath)\cookbooks\Tests\TestImageVersion.ps1" -Parameter @{ImgName = $SkuName}
+        $result = Invoke-AzVmssVMRunCommand -ResourceGroupName "$(resourcegroup)" -VMScaleSetName $vmssName -InstanceId '0' -CommandId 'RunPowerShellScript' -ScriptPath "$(Build.Repository.LocalPath)\cookbooks\Tests\TestImageVersion.ps1" -Parameter @{ImgName = $SkuName}
 
         $result | Out-Default | Write-Host
 
@@ -323,4 +340,12 @@ jobs:
     inputs:
       ArtifactName: Solution Template
       FileCopyOptions: ''
-...
+  - task: AzureResourceManagerTemplateDeployment@3
+    displayName: Delete resource group $(resourcegroup)
+    condition: succeeded()
+    inputs:
+      deploymentScope: 'Resource Group'
+      ConnectedServiceName: $(ConnectedServiceName)
+      action: 'DeleteRG'
+      resourceGroupName: $(resourcegroup)
+

@@ -66,10 +66,18 @@
                 "type": "Microsoft.Common.DropDown",
                 "label": "OS Name",
                 "toolTip": "Choose the Windows Server image version to use",
-                "defaultValue": "Windows Server 2019",
+                "defaultValue": "Windows Server 2022",
                 "constraints": {
                     "required": true,
                     "allowedValues":[
+                        {
+                            "label": "Windows Server 2022",
+                            "value": "Windows Server 2022"
+                        },
+                        {
+                            "label": "Windows Server 2022 JPN",
+                            "value": "Windows Server 2022 JPN"
+                        },
                         {
                             "label": "Windows Server 2019",
                             "value": "Windows Server 2019"
@@ -85,10 +93,6 @@
                         {
                             "label": "Windows Server 2016 JPN",
                             "value": "Windows Server 2016 JPN"
-                        },
-                        {
-                            "label": "Windows Server 2012",
-                            "value": "Windows Server 2012"
                         }
                     ]
                 }
@@ -104,7 +108,7 @@
                 "imageReference": {
                     "publisher": "lansa",
                     "offer": "lansa-scalable-license",
-                    "sku": "lansa-scalable-license-14-2"
+                    "sku": "w22d-15-0"
                 },
                 "count": "[int(basics('minimumInstanceCount'))]",
                 "osPlatform": "Windows"
@@ -120,7 +124,7 @@
                 "imageReference": {
                     "publisher": "lansa",
                     "offer": "lansa-scalable-license",
-                    "sku": "lansa-scalable-license-14-2"
+                    "sku": "w22d-15-0"
                 },
                 "count": 1,
                 "osPlatform": "Windows"
@@ -359,10 +363,6 @@
                                 {
                                     "label": "Azure SQL Database",
                                     "value": "SQLAZURE"
-                                },
-                                {
-                                    "label": "MySQL",
-                                    "value": "MYSQL"
                                 }
                             ]
                         },
@@ -1470,21 +1470,13 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Application Gateway SKU Tier",
                         "toolTip": "The v2 tiers offer performance enhancements and support for some critical new features. Choose a WAF tier to support Web Application Firewall on this Application Gateway. You can upgrade to a WAF tier after the application gateway has been created. [Learn more about tier differences](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-autoscaling-zone-redundant)",
-                        "defaultValue": "Standard",
+                        "defaultValue": "Standard_v2",
                         "constraints": {
                             "required": true,
                             "allowedValues":[
                                 {
-                                    "label": "Standard",
-                                    "value": "Standard"
-                                },
-                                {
                                     "label": "Standard V2",
                                     "value": "Standard_v2"
-                                },
-                                {
-                                    "label": "WAF",
-                                    "value": "WAF"
                                 },
                                 {
                                     "label": "WAF V2",

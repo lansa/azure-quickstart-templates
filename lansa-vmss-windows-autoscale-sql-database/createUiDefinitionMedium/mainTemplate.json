@@ -12,13 +12,15 @@
       "osName": {
          "type": "string",
          "allowedValues": [
+            "Windows Server 2022",
+            "Windows Server 2022 JPN",
             "Windows Server 2019",
             "Windows Server 2019 JPN",
             "Windows Server 2016",
             "Windows Server 2016 JPN",
             "Windows Server 2012"
          ],
-         "defaultValue": "Windows Server 2019",
+         "defaultValue": "Windows Server 2022",
          "metadata": {
             "description": "Choose the Windows Server image version to use "
          }
@@ -96,12 +98,10 @@
       "applicationGatewaySkuTier": {
          "type": "string",
          "allowedValues": [
-            "Standard",
             "Standard_v2",
-            "WAF",
             "WAF_v2"
          ],
-         "defaultValue": "Standard",
+         "defaultValue": "Standard_v2",
          "metadata": {
             "description": "Application Gateway SKU Tier"
          }

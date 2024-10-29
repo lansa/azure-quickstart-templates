@@ -1,5 +1,7 @@
 # Azure Resource Manager QuickStart Templates
 
+Azure [![Build status](https://dev.azure.com/VisualLansa/Lansa%20Azure%20Scalable%20License%20Images/_apis/build/status/CI%20Templates%203.0)](https://dev.azure.com/VisualLansa/Lansa%20Azure%20Scalable%20License%20Images/_build/latest?definitionId=53)
+
 This repo contains all currently available Azure Resource Manager templates contributed by the community. A searchable template index is maintained at [azure.com](https://azure.microsoft.com/en-us/documentation/templates/.)
 
 See the [**Contribution guide**](/1-CONTRIBUTION-GUIDE/README.md#contribution-guide) for how to use or contribute to this repo.

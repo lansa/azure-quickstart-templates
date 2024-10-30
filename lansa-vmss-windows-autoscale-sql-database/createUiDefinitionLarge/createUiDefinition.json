@@ -347,8 +347,8 @@
             "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
             "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
             "applicationGatewaySkuTier": "WAF_v2",
+            "applicationGatewaySkuName": "WAF_Medium",
             "agpublicIPAllocationMethod": "Static",
-            "agpublicIpSku": "Standard",
             "enableAutoscaling": true,
             "autoScaleMinCapacity": 2,
             "autoScaleMaxCapacity": 30

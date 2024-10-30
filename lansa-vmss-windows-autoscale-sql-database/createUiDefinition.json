@@ -1507,7 +1507,7 @@
                                 }
                             ]
                         },
-                        "visible": "[equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard')]"
+                        "visible": "[equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard_v2')]"
                     },
                     {
                         "name": "applicationGatewaySkuNameWAF",
@@ -1527,7 +1527,7 @@
                                 }
                             ]
                         },
-                        "visible": "[equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF')]"
+                        "visible": "[equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF_v2')]"
                     },
                     {
                         "name":"publicIpAddress",
@@ -1553,15 +1553,6 @@
                             "hideNone": true,
                             "hideDomainNameLabel": false,
                             "hideExisting": false
-                        }
-                    },
-                    {
-                        "name": "Error1",
-                        "type": "Microsoft.Common.InfoBox",
-                        "visible": "[and(or(equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard_v2'), equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF_v2')), equals(steps('applicationGatewayConfig').publicIpAddress.sku, 'Basic'))]",
-                        "options": {
-                        "icon": "Error",
-                        "text": "For v2 tiers, please create Public IP Address with SKU as Standard."
                         }
                     },
                     {

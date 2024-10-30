@@ -347,7 +347,6 @@
             "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
             "applicationGatewaySkuTier": "Standard_v2",
             "agpublicIPAllocationMethod": "Static",
-            "agpublicIpSku": "Standard",
             "enableAutoscaling": true,
             "autoScaleMinCapacity": 1,
             "autoScaleMaxCapacity": 15

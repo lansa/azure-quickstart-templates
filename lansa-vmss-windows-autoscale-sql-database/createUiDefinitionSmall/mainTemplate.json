@@ -17,8 +17,7 @@
             "Windows Server 2019",
             "Windows Server 2019 JPN",
             "Windows Server 2016",
-            "Windows Server 2016 JPN",
-            "Windows Server 2012"
+            "Windows Server 2016 JPN"
          ],
          "defaultValue": "Windows Server 2022",
          "metadata": {
@@ -574,14 +573,25 @@
                }
             }
          },
-         "Windows Server 2012": {
+         "Windows Server 2022": {
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w12r2d-15-0"
+                  "sku": "w22d-15-0"
                },
                "V14 SP2": {
-                  "sku": "lansa-scalable-license-14-2"
+                  "sku": "w22d-14-2"
+               }
+            }
+         },
+         "Windows Server 2022 JPN": {
+            "offer": "lansa-scalable-license",
+            "version": {
+               "V15 GA": {
+                  "sku": "w22d-15-0j"
+               },
+               "V14 SP2": {
+                  "sku": "w22d-14-2j"
                }
             }
          }

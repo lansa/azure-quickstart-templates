@@ -109,10 +109,6 @@
                         {
                             "label": "Windows Server 2016 JPN",
                             "value": "Windows Server 2016 JPN"
-                        },
-                        {
-                            "label": "Windows Server 2012",
-                            "value": "Windows Server 2012"
                         }
                     ]
                 }

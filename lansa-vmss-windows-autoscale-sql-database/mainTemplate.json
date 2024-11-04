@@ -17,8 +17,7 @@
             "Windows Server 2019",
             "Windows Server 2019 JPN",
             "Windows Server 2016",
-            "Windows Server 2016 JPN",
-            "Windows Server 2012"
+            "Windows Server 2016 JPN"
          ],
          "defaultValue": "Windows Server 2019",
          "metadata": {
@@ -592,17 +591,6 @@
                },
                "V14 SP2": {
                   "sku": "w16d-14-2j"
-               }
-            }
-         },
-         "Windows Server 2012": {
-            "offer": "lansa-scalable-license",
-            "version": {
-               "V15 GA": {
-                  "sku": "w12r2d-15-0"
-               },
-               "V14 SP2": {
-                  "sku": "lansa-scalable-license-14-2"
                }
             }
          }

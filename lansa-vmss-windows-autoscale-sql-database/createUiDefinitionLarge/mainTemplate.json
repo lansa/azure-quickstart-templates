@@ -157,9 +157,8 @@
        },
        "agpublicIpAllocationMethod": {
          "type": "string",
-         "defaultValue": "Dynamic",
+         "defaultValue": "Static",
          "allowedValues": [
-           "Dynamic",
            "Static"
          ],
          "metadata": {
@@ -168,13 +167,12 @@
        },
        "agpublicIpSku": {
          "type": "string",
-         "defaultValue": "Basic",
+         "defaultValue": "Standard",
          "allowedValues": [
-           "Basic",
            "Standard"
          ],
          "metadata": {
-           "description": "Name of the resource group for the public ip address"
+           "description": "Type of public ip address"
          }
        },
       "autoScaleMinCapacity": {

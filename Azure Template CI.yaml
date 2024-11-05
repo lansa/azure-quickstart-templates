@@ -91,7 +91,7 @@ jobs:
       azurePowerShellVersion: LatestVersion
 
   - task: AzureResourceManagerTemplateDeployment@3
-    displayName: 'Deploy ARM Template : BakingDP-TemplateTest'
+    displayName: 'Deploy ARM Template : BakingDP-CITemplates'
     condition: or(succeeded(), eq(variables['ForceDeploy'], 'True'))
     inputs:
       ConnectedServiceName: $(ConnectedServiceName)
@@ -185,7 +185,7 @@ jobs:
             Write-Host "Successfully tested all URL(s)"
         }
   - task: AzurePowerShell@5
-    displayName: 'Azure PowerShell : Test Image Version w12r2d-14-2 Prod'
+    displayName: 'Azure PowerShell : Test Image Version Prod'
     condition: or(succeeded(), eq(variables['ForceDeploy'], 'True'))
     inputs:
       ConnectedServiceNameARM: $(ConnectedServiceName)
@@ -193,7 +193,7 @@ jobs:
       Inline: >-
         Install-Module -Name Az.Compute -AllowClobber -Force
 
-        $SkuName = "w12r2d-14-2-$(TestVersion-w12r2d-14-2)"
+        $SkuName = "w22d-15-0-$(TestVersion)"
 
 
         $var=ConvertFrom-Json '$(deploymentOutput)'

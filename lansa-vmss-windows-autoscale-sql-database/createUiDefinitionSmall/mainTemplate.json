@@ -108,13 +108,10 @@
       "applicationGatewaySkuName": {
          "type": "string",
          "allowedValues": [
-            "Standard_Small",
-            "Standard_Medium",
-            "Standard_Large",
-            "WAF_Medium",
-            "WAF_Large"
+            "Standard_v2",
+            "WAF_v2"
          ],
-         "defaultValue": "Standard_Medium",
+         "defaultValue": "Standard_v2",
          "metadata": {
             "description": "Application Gateway SKU Name"
          }
@@ -529,6 +526,28 @@
       "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), variables('lbFrontEndName'))]",
       "marketplaceSettings": {
 
+	"Windows Server 2022": {
+            "offer": "lansa-scalable-license",
+            "version": {
+               "V15 GA": {
+                  "sku": "w22d-15-0"
+               },
+               "V14 SP2": {
+                  "sku": "w22d-14-2"
+               }
+            }
+         },
+         "Windows Server 2022 JPN": {
+            "offer": "lansa-scalable-license",
+            "version": {
+               "V15 GA": {
+                  "sku": "w22d-15-0j"
+               },
+               "V14 SP2": {
+                  "sku": "w22d-14-2j"
+               }
+            }
+         },
          "Windows Server 2019": {
             "offer": "lansa-scalable-license",
             "version": {
@@ -570,28 +589,6 @@
                },
                "V14 SP2": {
                   "sku": "w16d-14-2j"
-               }
-            }
-         },
-         "Windows Server 2022": {
-            "offer": "lansa-scalable-license",
-            "version": {
-               "V15 GA": {
-                  "sku": "w22d-15-0"
-               },
-               "V14 SP2": {
-                  "sku": "w22d-14-2"
-               }
-            }
-         },
-         "Windows Server 2022 JPN": {
-            "offer": "lansa-scalable-license",
-            "version": {
-               "V15 GA": {
-                  "sku": "w22d-15-0j"
-               },
-               "V14 SP2": {
-                  "sku": "w22d-14-2j"
                }
             }
          }
@@ -1318,10 +1315,6 @@
          "type": "string",
          "value": "[if(variables('isAgPublicIPNew'), concat('https://', reference(variables('agPublicIPAddressID')).dnsSettings.fqdn), concat('https://', reference(variables('agPublicIPAddressID'), '2018-07-01').dnsSettings.fqdn))]"
       },
-      //"dbrdpAddress": {
-       //  "type": "string",
-       //  "value": "[concat(reference(variables('dbpublicIPAddressName')).dnsSettings.fqdn, ':50000')]"
-      //},
       "rdpAddress": {
          "type": "string",
          "value": "[concat(reference(variables('publicIPAddressName')).dnsSettings.fqdn, ':50000')]"

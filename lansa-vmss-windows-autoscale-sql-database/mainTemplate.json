@@ -19,7 +19,7 @@
             "Windows Server 2016",
             "Windows Server 2016 JPN"
          ],
-         "defaultValue": "Windows Server 2019",
+         "defaultValue": "Windows Server 2022",
          "metadata": {
             "description": "Choose the Windows Server image version to use "
          }
@@ -109,8 +109,6 @@
          "type": "string",
          "allowedValues": [
             "Standard_v2",
-            "WAF_Medium",
-            "WAF_Large",
             "WAF_v2"
          ],
          "defaultValue": "Standard_v2",
@@ -491,7 +489,7 @@
    },
    "variables": {
       "isCustomImage": "[equals(parameters('imageSource'), 'Custom')]",
-      "addAGName" : "[or(equals(parameters('applicationGatewaySkuTier'), 'Standard_v2'), equals(parameters('applicationGatewaySkuTier'), 'WAF'))]",
+      "addAGName" : "[or(equals(parameters('applicationGatewaySkuTier'), 'Standard'), equals(parameters('applicationGatewaySkuTier'), 'WAF'))]",
       "autoScaleConfig" : {
          "minCapacity": "[parameters('autoScaleMinCapacity')]",
          "maxCapacity": "[parameters('autoScaleMaxCapacity')]"

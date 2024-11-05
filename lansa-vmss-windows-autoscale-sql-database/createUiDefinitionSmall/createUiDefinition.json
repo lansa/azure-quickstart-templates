@@ -341,7 +341,7 @@
             "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
             "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
             "applicationGatewaySkuTier": "Standard_v2",
-            "applicationGatewaySkuName": "Standard_Small",
+            "applicationGatewaySkuName": "Standard_v2",
             "applicationGatewayCapacity": 2
         }
     }

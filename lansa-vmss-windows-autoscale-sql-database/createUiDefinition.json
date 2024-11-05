@@ -1,1808 +1,1764 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
-    "handler": "Microsoft.Azure.CreateUIDef",
-    "version": "0.1.2-preview",
-    "parameters": {
-        "basics": [
-            {
-                "name": "stackName",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Stack Name",
-                "toolTip": "String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended. Some identifiers use precisely 9 characters from this name and so it can be useful to use exactly 9. The template pads it out or truncates it as necessary to make it 9 characters long where required.",
-                "constraints": {
-                    "required": true,
-                    "regex": "^([a-zA-z-]{3,61})$",
-                    "validationMessage": "Only alphabets and hyphen are allowed, and the value must be 3-61 characters long."
-                }
-            },
-            {
-                "name": "lansaVersion",
-                "type": "Microsoft.Common.DropDown",
-                "label": "LANSA Version",
-                "toolTip": "Visual LANSA Version",
-                "defaultValue": "V15 GA",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "V15 GA",
-                            "value": "V15 GA"
-                        },
-                        {
-                            "label": "V14 SP2",
-                            "value": "V14 SP2"
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "msiURLV15",
-                "type": "Microsoft.Common.TextBox",
-                "label": "MSI URL",
-                "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine. A demonstration MSI is provided as a default value and this should not be used for any other purpose",
-                "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v15.0.21217_en-us.msi",
-                "constraints": {
-                    "required": true,
-                    "regex": "^(?!\\s*$).+",
-                    "validationMessage": "The value must not be empty."
-                },
-                "visible": "[equals(basics('lansaVersion'), 'V15 GA')]"
-            },
-            {
-                "name": "msiURLV14",
-                "type": "Microsoft.Common.TextBox",
-                "label": "MSI URL",
-                "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine. A demonstration MSI is provided as a default value and this should not be used for any other purpose",
-                "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v14.2.21217_en-us.msi",
-                "constraints": {
-                    "required": true,
-                    "regex": "^(?!\\s*$).+",
-                    "validationMessage": "The value must not be empty."
-                },
-                "visible": "[equals(basics('lansaVersion'), 'V14 SP2')]"
-            },
-            {
-                "name": "osName",
-                "type": "Microsoft.Common.DropDown",
-                "label": "OS Name",
-                "toolTip": "Choose the Windows Server image version to use",
-                "defaultValue": "Windows Server 2022",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "Windows Server 2022",
-                            "value": "Windows Server 2022"
-                        },
-                        {
-                            "label": "Windows Server 2022 JPN",
-                            "value": "Windows Server 2022 JPN"
-                        },
-                        {
-                            "label": "Windows Server 2019",
-                            "value": "Windows Server 2019"
-                        },
-                        {
-                            "label": "Windows Server 2019 JPN",
-                            "value": "Windows Server 2019 JPN"
-                        },
-                        {
-                            "label": "Windows Server 2016",
-                            "value": "Windows Server 2016"
-                        },
-                        {
-                            "label": "Windows Server 2016 JPN",
-                            "value": "Windows Server 2016 JPN"
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "virtualMachineSize",
-                "type": "Microsoft.Compute.SizeSelector",
-                "label": "App Virtual machine size",
-                "toolTip": "The size of virtual machine to provision.",
-                "recommendedSizes": [
-                    "Standard_B4ms"
-                ],
-                "imageReference": {
-                    "publisher": "lansa",
-                    "offer": "lansa-scalable-license",
-                    "sku": "w22d-15-0"
-                },
-                "count": "[int(basics('minimumInstanceCount'))]",
-                "osPlatform": "Windows"
-            },
-            {
-                "name": "dbVirtualMachineSize",
-                "type": "Microsoft.Compute.SizeSelector",
-                "label": "DB Admin Virtual machine size",
-                "toolTip": "Size of the Virtual Machine which manages the database.",
-                "recommendedSizes": [
-                    "Standard_B2ms"
-                ],
-                "imageReference": {
-                    "publisher": "lansa",
-                    "offer": "lansa-scalable-license",
-                    "sku": "w22d-15-0"
-                },
-                "count": 1,
-                "osPlatform": "Windows"
-            },
-            {
-                "name": "minimumInstanceCount",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Minimum Instance Count",
-                "toolTip": "Minimum number of Virtual Machine instances (1 to 600).",
-                "defaultValue": "[int('1')]",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[1-9][0-9]?$|^[1-5][0-9][0-9]?$|^600$",
-                    "validationMessage": "Only numerals are allowed. The value must be from 1-600."
-                }
-            },
-            {
-                "name": "maximumInstanceCount",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Maximum Instance Count",
-                "toolTip": "Maximum number of Virtual Machine instances (1 to 600).",
-                "defaultValue": "[int('100')]",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[1-9][0-9]?$|^[1-5][0-9][0-9]?$|^600$",
-                    "validationMessage": "Only numerals are allowed. The value must be from 1-600."
-                }
-            },
-            {
-                "name": "webServerMaxConnect",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Web Server Max Connect",
-                "toolTip": "The maximum number of LANSA jobs to run on each Web Server. Setting triggerWebConfig will cause this value to be updated.",
-                "defaultValue": "20",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[0-9]+$",
-                    "validationMessage": "Numeric field."
-                }
-            }
-        ],
-        "steps": [
-            {
-                "name": "SecurityConfig",
-                "label": "Security",
-                "subLabel": {
-                    "preValidation": "Configurations regarding credentials",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "Security",
-                "elements": [
-                    {
-                        "name": "keyVaultEnabled",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Key Vault Enabled",
-                        "defaultValue": "True",
-                        "toolTip": "Set to true to use a Certificate created in Key Vault. Set to false to explicitly provide the certificate string",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "True",
-                                    "value": "true"
-                                },
-                                {
-                                    "label": "False",
-                                    "value": "false"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "certificateBase64Encoded",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Certificate Base64Encoded",
-                        "toolTip": "Base 64 encoded String representing the SSL certificate",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
-                    },
-                    {
-                        "name": "certificatePassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Certificate Password",
-                            "confirmPassword": "Confirm Certificate Password"
-                        },
-                        "toolTip": "SSL certificate password",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
-                    },
-                    {
-                        "name": "keyVaultName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Key Vault Name",
-                        "toolTip": "Name of the Key Vault which contains the Certificate and Secret",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
-                    },
-                    {
-                        "name": "keyVaultCertificateName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Key Vault Certificate Name",
-                        "toolTip": "Name of the Certificate stored in Key Vault",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
-                    },
-                    {
-                        "name": "keyVaultRGName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Key Vault Resource Group Name",
-                        "toolTip": "Name of the Resource Group which contains the Key Vault",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
-                    },
-                    {
-                        "name": "adminUsername",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Admin Username",
-                        "toolTip": "Admin username on all VMs",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "adminPassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Admin Password",
-                            "confirmPassword": "Confirm Admin Password"
-                        },
-                        "toolTip": "Admin password on all VMs",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true,
-                            "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
-                            "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
-                        }
-                    },
-                    {
-                        "name": "webUsername",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Web Username",
-                        "toolTip": "Web Server username on all VMs. This should be different from Admin Username",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "webPassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Web Password",
-                            "confirmPassword": "Confirm Web Password"
-                        },
-                        "toolTip": "Web Server password on all VMs",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true,
-                            "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
-                            "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "DatabaseConfig",
-                "label": "Database",
-                "subLabel": {
-                    "preValidation": "Configure the database resources and settings",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "Database",
-                "elements": [
-                    {
-                        "name": "databaseNewOrExisting",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Database New/Existing",
-                        "toolTip": "Determines whether a new SQL database should be provisioned or to use an existing database.",
-                        "defaultValue": "New",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "New",
-                                    "value": "new"
-                                },
-                                {
-                                    "label": "Existing",
-                                    "value": "existing"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "databaseType",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Database Type",
-                        "toolTip": "Refer to LANSA documentation for an explanation of each Database Type and the supported versions of the database servers.",
-                        "defaultValue": "Azure SQL Database",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "SQL Server",
-                                    "value": "MSSQLS"
-                                },
-                                {
-                                    "label": "Azure SQL Database",
-                                    "value": "SQLAZURE"
-                                }
-                            ]
-                        },
-                        "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'existing')]"
-                    },
-                    {
-                        "name": "databaseServerName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Database Server Name",
-                        "toolTip": "The name of the existing Database Server to connect to. If the name has /MSSQLSERVER appended, omit it.",
-                        "defaultValue": "lansa",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'existing')]"
-                    },
-                    {
-                        "name": "databaseName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Database Name",
-                        "toolTip": "The name of the new database to create or name of the existing database to connect to.",
-                        "defaultValue": "lansa",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'existing')]"
-                    },
-                    {
-                        "name": "collation",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Collation",
-                        "toolTip": "The new database collation for governing the proper use of characters.",
-                        "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'new')]"
-                    },
-                    {
-                        "name": "edition",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Edition",
-                        "toolTip": "The type of database to create.",
-                        "defaultValue": "Standard",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "Serverless",
-                                    "value": "Serverless"
-                                },
-                                {
-                                    "label": "Basic",
-                                    "value": "Basic"
-                                },
-                                {
-                                    "label": "Standard",
-                                    "value": "Standard"
-                                },
-                                {
-                                    "label": "Premium",
-                                    "value": "Premium"
-                                }
-                            ]
-                        },
-                        "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'new')]"
-                    },
-                    {
-                        "name": "requestedServiceObjectiveNameBasic",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Requested Service Objective Name",
-                        "toolTip": "Describes the performance level for Edition",
-                        "defaultValue": "Basic",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "Basic",
-                                    "value": "Basic"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Basic'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
-                    },
-                    {
-                        "name": "requestedServiceObjectiveNameStandard",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Requested Service Objective Name",
-                        "toolTip": "Describes the performance level for Edition",
-                        "defaultValue": "S2",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "S0",
-                                    "value": "S0"
-                                },
-                                {
-                                    "label": "S1",
-                                    "value": "S1"
-                                },
-                                {
-                                    "label": "S2",
-                                    "value": "S2"
-                                },
-                                {
-                                    "label": "S3",
-                                    "value": "S3"
-                                },
-                                {
-                                    "label": "S4",
-                                    "value": "S4"
-                                },
-                                {
-                                    "label": "S6",
-                                    "value": "S6"
-                                },
-                                {
-                                    "label": "S7",
-                                    "value": "S7"
-                                },
-                                {
-                                    "label": "S9",
-                                    "value": "S9"
-                                },
-                                {
-                                    "label": "S12",
-                                    "value": "S12"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Standard'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
-                    },
-                    {
-                        "name": "requestedServiceObjectiveNamePremium",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Requested Service Objective Name",
-                        "toolTip": "Describes the performance level for Edition",
-                        "defaultValue": "P2",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "P1",
-                                    "value": "P1"
-                                },
-                                {
-                                    "label": "P2",
-                                    "value": "P2"
-                                },
-                                {
-                                    "label": "P4",
-                                    "value": "P4"
-                                },
-                                {
-                                    "label": "P6",
-                                    "value": "P6"
-                                },
-                                {
-                                    "label": "P11",
-                                    "value": "P11"
-                                },
-                                {
-                                    "label": "P15",
-                                    "value": "P15"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Premium'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
-                    },
-                    {
-                        "name": "serverlessDbCapacity",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Max vCores",
-                        "toolTip": "The maximum number of cores available to use in the database. [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). [Learn more about how Gen5 serverless parameters effect the resources available to the database server](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "1",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "1",
-                                    "value": 1
-                                },
-                                {
-                                    "label": "2",
-                                    "value": 2
-                                },
-                                {
-                                    "label": "4",
-                                    "value": 4
-                                },
-                                {
-                                    "label": "6",
-                                    "value": 6
-                                },
-                                {
-                                    "label": "8",
-                                    "value": 8
-                                },
-                                {
-                                    "label": "10",
-                                    "value": 10
-                                },
-                                {
-                                    "label": "12",
-                                    "value": 12
-                                },
-                                {
-                                    "label": "14",
-                                    "value": 14
-                                },
-                                {
-                                    "label": "16",
-                                    "value": 16
-                                },
-                                {
-                                    "label": "18",
-                                    "value": 18
-                                },
-                                {
-                                    "label": "20",
-                                    "value": 20
-                                },
-                                {
-                                    "label": "24",
-                                    "value": 24
-                                },
-                                {
-                                    "label": "32",
-                                    "value": 32
-                                },
-                                {
-                                    "label": "40",
-                                    "value": 40
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
-                    },
-                    {
-                        "name": "dbMinCapacity1",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "0.5",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "0.5",
-                                    "value": "0.5"
-                                },
-                                {
-                                    "label": "0.75",
-                                    "value": "0.75"
-                                },
-                                {
-                                    "label": "1.0",
-                                    "value": "1.0"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 1))]"
-                    },
-                    {
-                        "name": "dbMinCapacity2",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "0.5",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "0.5",
-                                    "value": "0.5"
-                                },
-                                {
-                                    "label": "0.75",
-                                    "value": "0.75"
-                                },
-                                {
-                                    "label": "1.0",
-                                    "value": "1.0"
-                                },
-                                {
-                                    "label": "1.25",
-                                    "value": "1.25"
-                                },
-                                {
-                                    "label": "1.5",
-                                    "value": "1.5"
-                                },
-                                {
-                                    "label": "1.75",
-                                    "value": "1.75"
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 2))]"
-                    },
-                    {
-                        "name": "dbMinCapacity4",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "0.5",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "0.5",
-                                    "value": "0.5"
-                                },
-                                {
-                                    "label": "0.75",
-                                    "value": "0.75"
-                                },
-                                {
-                                    "label": "1.0",
-                                    "value": "1.0"
-                                },
-                                {
-                                    "label": "1.25",
-                                    "value": "1.25"
-                                },
-                                {
-                                    "label": "1.5",
-                                    "value": "1.5"
-                                },
-                                {
-                                    "label": "1.75",
-                                    "value": "1.75"
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 4))]"
-                    },
-                    {
-                        "name": "dbMinCapacity6",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "0.75",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "0.75",
-                                    "value": "0.75"
-                                },
-                                {
-                                    "label": "1.0",
-                                    "value": "1.0"
-                                },
-                                {
-                                    "label": "1.25",
-                                    "value": "1.25"
-                                },
-                                {
-                                    "label": "1.5",
-                                    "value": "1.5"
-                                },
-                                {
-                                    "label": "1.75",
-                                    "value": "1.75"
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 6))]"
-                    },
-                    {
-                        "name": "dbMinCapacity8",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "1.0",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "1.0",
-                                    "value": "1.0"
-                                },
-                                {
-                                    "label": "1.25",
-                                    "value": "1.25"
-                                },
-                                {
-                                    "label": "1.5",
-                                    "value": "1.5"
-                                },
-                                {
-                                    "label": "1.75",
-                                    "value": "1.75"
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 8))]"
-                    },
-                    {
-                        "name": "dbMinCapacity10",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "1.25",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "1.25",
-                                    "value": "1.25"
-                                },
-                                {
-                                    "label": "1.5",
-                                    "value": "1.5"
-                                },
-                                {
-                                    "label": "1.75",
-                                    "value": "1.75"
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 10))]"
-                    },
-                    {
-                        "name": "dbMinCapacity12",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "1.5",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "1.5",
-                                    "value": "1.5"
-                                },
-                                {
-                                    "label": "1.75",
-                                    "value": "1.75"
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 12))]"
-                    },
-                    {
-                        "name": "dbMinCapacity14",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "1.75",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "1.75",
-                                    "value": "1.75"
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                },
-                                {
-                                    "label": "14",
-                                    "value": "14"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 14))]"
-                    },
-                    {
-                        "name": "dbMinCapacity16",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "2",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                },
-                                {
-                                    "label": "14",
-                                    "value": "14"
-                                },
-                                {
-                                    "label": "16",
-                                    "value": "16"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 16))]"
-                    },
-                    {
-                        "name": "dbMinCapacity18",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "2.25",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "2.25",
-                                    "value": "2.25"
-                                },
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                },
-                                {
-                                    "label": "14",
-                                    "value": "14"
-                                },
-                                {
-                                    "label": "16",
-                                    "value": "16"
-                                },
-                                {
-                                    "label": "18",
-                                    "value": "18"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 18))]"
-                    },
-                    {
-                        "name": "dbMinCapacity20",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "2.5",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "2.5",
-                                    "value": "2.5"
-                                },
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                },
-                                {
-                                    "label": "14",
-                                    "value": "14"
-                                },
-                                {
-                                    "label": "16",
-                                    "value": "16"
-                                },
-                                {
-                                    "label": "18",
-                                    "value": "18"
-                                },
-                                {
-                                    "label": "20",
-                                    "value": "20"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 20))]"
-                    },
-                    {
-                        "name": "dbMinCapacity24",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "3",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "3",
-                                    "value": "3"
-                                },
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                },
-                                {
-                                    "label": "14",
-                                    "value": "14"
-                                },
-                                {
-                                    "label": "16",
-                                    "value": "16"
-                                },
-                                {
-                                    "label": "18",
-                                    "value": "18"
-                                },
-                                {
-                                    "label": "20",
-                                    "value": "20"
-                                },
-                                {
-                                    "label": "24",
-                                    "value": "24"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 24))]"
-                    },
-                    {
-                        "name": "dbMinCapacity32",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "4",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "4",
-                                    "value": "4"
-                                },
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                },
-                                {
-                                    "label": "14",
-                                    "value": "14"
-                                },
-                                {
-                                    "label": "16",
-                                    "value": "16"
-                                },
-                                {
-                                    "label": "18",
-                                    "value": "18"
-                                },
-                                {
-                                    "label": "20",
-                                    "value": "20"
-                                },
-                                {
-                                    "label": "24",
-                                    "value": "24"
-                                },
-                                {
-                                    "label": "32",
-                                    "value": "32"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 32))]"
-                    },
-                    {
-                        "name": "dbMinCapacity40",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Min vCores",
-                        "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
-                        "defaultValue": "5",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "5",
-                                    "value": "5"
-                                },
-                                {
-                                    "label": "6",
-                                    "value": "6"
-                                },
-                                {
-                                    "label": "8",
-                                    "value": "8"
-                                },
-                                {
-                                    "label": "10",
-                                    "value": "10"
-                                },
-                                {
-                                    "label": "12",
-                                    "value": "12"
-                                },
-                                {
-                                    "label": "14",
-                                    "value": "14"
-                                },
-                                {
-                                    "label": "16",
-                                    "value": "16"
-                                },
-                                {
-                                    "label": "18",
-                                    "value": "18"
-                                },
-                                {
-                                    "label": "20",
-                                    "value": "20"
-                                },
-                                {
-                                    "label": "24",
-                                    "value": "24"
-                                },
-                                {
-                                    "label": "32",
-                                    "value": "32"
-                                },
-                                {
-                                    "label": "40",
-                                    "value": "40"
-                                }
-                            ]
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 40))]"
-                    },
-                    {
-                        "name": "autoPauseDelay",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Auto Pause Delay",
-                        "toolTip": "Number of minutes to wait until pausing the database. Minimum 60. Maximum 10, 080 ( 7  days). Specify -1 to disable the delay  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview)",
-                        "defaultValue": "60",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(-1|[6-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|100[0-7][0-9]|10080)$",
-                            "validationMessage": "The value must be in range 60 - 10080 (7 days). Specify -1 to disable auto pause."
-                        },
-                        "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
-                    },
-                    {
-                        "name": "maxSizeBytes",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Max Size Bytes",
-                        "toolTip": "The maximum size, in bytes, for the new database",
-                        "defaultValue": "1073741824",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^[0-9]+$",
-                            "validationMessage": "Numeric field."
-                        },
-                        "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'new')]"
-                    },
-                    {
-                        "name": "databaseLogin",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Database Login",
-                        "toolTip": "The admin user of the Database",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "databaseLoginPassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Database Password",
-                            "confirmPassword": "Confirm Database Password"
-                        },
-                        "toolTip": "The password of the admin user of the Database",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "applicationGatewayConfig",
-                "label": "Application Gateway",
-                "subLabel": {
-                    "preValidation": "Configure the application gateway resources and settings",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "Application Gateway",
-                "elements": [
-                    {
-                        "name": "applicationGatewaySkuTier",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Application Gateway SKU Tier",
-                        "toolTip": "The v2 tiers offer performance enhancements and support for some critical new features. Choose a WAF tier to support Web Application Firewall on this Application Gateway. You can upgrade to a WAF tier after the application gateway has been created. [Learn more about tier differences](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-autoscaling-zone-redundant)",
-                        "defaultValue": "Standard_v2",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "Standard V2",
-                                    "value": "Standard_v2"
-                                },
-                                {
-                                    "label": "WAF V2",
-                                    "value": "WAF_v2"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "applicationGatewaySkuNameStandard",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Application Gateway SKU Name",
-                        "toolTip": "Application Gateway SKU Name",
-                        "defaultValue": "Standard Medium",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "Standard Small",
-                                    "value": "Standard_Small"
-                                },
-                                {
-                                    "label": "Standard Medium",
-                                    "value": "Standard_Medium"
-                                },{
-                                    "label": "Standard Large",
-                                    "value": "Standard_Large"
-                                }
-                            ]
-                        },
-                        "visible": "[equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard_v2')]"
-                    },
-                    {
-                        "name": "applicationGatewaySkuNameWAF",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Application Gateway SKU Name",
-                        "toolTip": "Application Gateway SKU Name",
-                        "defaultValue": "WAF Medium",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "WAF Medium",
-                                    "value": "WAF_Medium"
-                                },{
-                                    "label": "WAF Large",
-                                    "value": "WAF_Large"
-                                }
-                            ]
-                        },
-                        "visible": "[equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF_v2')]"
-                    },
-                    {
-                        "name":"publicIpAddress",
-                        "type": "Microsoft.Network.PublicIpAddressCombo",
-                        "label": {
-                            "publicIpAddress": "Application Gateway Public IP address",
-                            "domainNameLabel": "Domain name label"
-                        },
-                        "toolTip": {
-                           "publicIpAddress": "Whether to use an existing public IP Address or create a new one",
+   "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+   "handler": "Microsoft.Azure.CreateUIDef",
+   "version": "0.1.2-preview",
+   "parameters": {
+       "basics": [
+           {
+               "name": "stackName",
+               "type": "Microsoft.Common.TextBox",
+               "label": "Stack Name",
+               "toolTip": "String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended. Some identifiers use precisely 9 characters from this name and so it can be useful to use exactly 9. The template pads it out or truncates it as necessary to make it 9 characters long where required.",
+               "constraints": {
+                   "required": true,
+                   "regex": "^([a-zA-z-]{3,61})$",
+                   "validationMessage": "Only alphabets and hyphen are allowed, and the value must be 3-61 characters long."
+               }
+           },
+           {
+               "name": "lansaVersion",
+               "type": "Microsoft.Common.DropDown",
+               "label": "LANSA Version",
+               "toolTip": "Visual LANSA Version",
+               "defaultValue": "V15 GA",
+               "constraints": {
+                   "required": true,
+                   "allowedValues":[
+                       {
+                           "label": "V15 GA",
+                           "value": "V15 GA"
+                       },
+                       {
+                           "label": "V14 SP2",
+                           "value": "V14 SP2"
+                       }
+                   ]
+               }
+           },
+           {
+               "name": "msiURLV15",
+               "type": "Microsoft.Common.TextBox",
+               "label": "MSI URL",
+               "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine. A demonstration MSI is provided as a default value and this should not be used for any other purpose",
+               "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v15.0.21217_en-us.msi",
+               "constraints": {
+                   "required": true,
+                   "regex": "^(?!\\s*$).+",
+                   "validationMessage": "The value must not be empty."
+               },
+               "visible": "[equals(basics('lansaVersion'), 'V15 GA')]"
+           },
+           {
+               "name": "msiURLV14",
+               "type": "Microsoft.Common.TextBox",
+               "label": "MSI URL",
+               "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine. A demonstration MSI is provided as a default value and this should not be used for any other purpose",
+               "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v14.2.21217_en-us.msi",
+               "constraints": {
+                   "required": true,
+                   "regex": "^(?!\\s*$).+",
+                   "validationMessage": "The value must not be empty."
+               },
+               "visible": "[equals(basics('lansaVersion'), 'V14 SP2')]"
+           },
+           {
+               "name": "osName",
+               "type": "Microsoft.Common.DropDown",
+               "label": "OS Name",
+               "toolTip": "Choose the Windows Server image version to use",
+               "defaultValue": "Windows Server 2022",
+               "constraints": {
+                   "required": true,
+                   "allowedValues":[
+                       {
+                           "label": "Windows Server 2022",
+                           "value": "Windows Server 2022"
+                       },
+                       {
+                           "label": "Windows Server 2022 JPN",
+                           "value": "Windows Server 2022 JPN"
+                       },
+                       {
+                           "label": "Windows Server 2019",
+                           "value": "Windows Server 2019"
+                       },
+                       {
+                           "label": "Windows Server 2019 JPN",
+                           "value": "Windows Server 2019 JPN"
+                       },
+                       {
+                           "label": "Windows Server 2016",
+                           "value": "Windows Server 2016"
+                       },
+                       {
+                           "label": "Windows Server 2016 JPN",
+                           "value": "Windows Server 2016 JPN"
+                       }
+                   ]
+               }
+           },
+           {
+               "name": "virtualMachineSize",
+               "type": "Microsoft.Compute.SizeSelector",
+               "label": "App Virtual machine size",
+               "toolTip": "The size of virtual machine to provision.",
+               "recommendedSizes": [
+                   "Standard_B4ms"
+               ],
+               "imageReference": {
+                   "publisher": "lansa",
+                   "offer": "lansa-scalable-license",
+                   "sku": "w22d-15-0"
+               },
+               "count": "[int(basics('minimumInstanceCount'))]",
+               "osPlatform": "Windows"
+           },
+           {
+               "name": "dbVirtualMachineSize",
+               "type": "Microsoft.Compute.SizeSelector",
+               "label": "DB Admin Virtual machine size",
+               "toolTip": "Size of the Virtual Machine which manages the database.",
+               "recommendedSizes": [
+                   "Standard_B2ms"
+               ],
+               "imageReference": {
+                   "publisher": "lansa",
+                   "offer": "lansa-scalable-license",
+                   "sku": "w22d-15-0"
+               },
+               "count": 1,
+               "osPlatform": "Windows"
+           },
+           {
+               "name": "minimumInstanceCount",
+               "type": "Microsoft.Common.TextBox",
+               "label": "Minimum Instance Count",
+               "toolTip": "Minimum number of Virtual Machine instances (1 to 600).",
+               "defaultValue": "[int('1')]",
+               "constraints": {
+                   "required": true,
+                   "regex": "^[1-9][0-9]?$|^[1-5][0-9][0-9]?$|^600$",
+                   "validationMessage": "Only numerals are allowed. The value must be from 1-600."
+               }
+           },
+           {
+               "name": "maximumInstanceCount",
+               "type": "Microsoft.Common.TextBox",
+               "label": "Maximum Instance Count",
+               "toolTip": "Maximum number of Virtual Machine instances (1 to 600).",
+               "defaultValue": "[int('100')]",
+               "constraints": {
+                   "required": true,
+                   "regex": "^[1-9][0-9]?$|^[1-5][0-9][0-9]?$|^600$",
+                   "validationMessage": "Only numerals are allowed. The value must be from 1-600."
+               }
+           },
+           {
+               "name": "webServerMaxConnect",
+               "type": "Microsoft.Common.TextBox",
+               "label": "Web Server Max Connect",
+               "toolTip": "The maximum number of LANSA jobs to run on each Web Server. Setting triggerWebConfig will cause this value to be updated.",
+               "defaultValue": "20",
+               "constraints": {
+                   "required": true,
+                   "regex": "^[0-9]+$",
+                   "validationMessage": "Numeric field."
+               }
+           }
+       ],
+       "steps": [
+           {
+               "name": "SecurityConfig",
+               "label": "Security",
+               "subLabel": {
+                   "preValidation": "Configurations regarding credentials",
+                   "postValidation": "Done"
+               },
+               "bladeTitle": "Security",
+               "elements": [
+                   {
+                       "name": "keyVaultEnabled",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Key Vault Enabled",
+                       "defaultValue": "True",
+                       "toolTip": "Set to true to use a Certificate created in Key Vault. Set to false to explicitly provide the certificate string",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "True",
+                                   "value": "true"
+                               },
+                               {
+                                   "label": "False",
+                                   "value": "false"
+                               }
+                           ]
+                       }
+                   },
+                   {
+                       "name": "certificateBase64Encoded",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Certificate Base64Encoded",
+                       "toolTip": "Base 64 encoded String representing the SSL certificate",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
+                   },
+                   {
+                       "name": "certificatePassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Certificate Password",
+                           "confirmPassword": "Confirm Certificate Password"
+                       },
+                       "toolTip": "SSL certificate password",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
+                   },
+                   {
+                       "name": "keyVaultName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Key Vault Name",
+                       "toolTip": "Name of the Key Vault which contains the Certificate and Secret",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
+                   },
+                   {
+                       "name": "keyVaultCertificateName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Key Vault Certificate Name",
+                       "toolTip": "Name of the Certificate stored in Key Vault",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
+                   },
+                   {
+                       "name": "keyVaultRGName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Key Vault Resource Group Name",
+                       "toolTip": "Name of the Resource Group which contains the Key Vault",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
+                   },
+                   {
+                       "name": "adminUsername",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Admin Username",
+                       "toolTip": "Admin username on all VMs",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "adminPassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Admin Password",
+                           "confirmPassword": "Confirm Admin Password"
+                       },
+                       "toolTip": "Admin password on all VMs",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true,
+                           "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
+                           "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
+                       }
+                   },
+                   {
+                       "name": "webUsername",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Web Username",
+                       "toolTip": "Web Server username on all VMs. This should be different from Admin Username",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "webPassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Web Password",
+                           "confirmPassword": "Confirm Web Password"
+                       },
+                       "toolTip": "Web Server password on all VMs",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true,
+                           "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
+                           "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
+                       }
+                   }
+               ]
+           },
+           {
+               "name": "DatabaseConfig",
+               "label": "Database",
+               "subLabel": {
+                   "preValidation": "Configure the database resources and settings",
+                   "postValidation": "Done"
+               },
+               "bladeTitle": "Database",
+               "elements": [
+                   {
+                       "name": "databaseNewOrExisting",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Database New/Existing",
+                       "toolTip": "Determines whether a new SQL database should be provisioned or to use an existing database.",
+                       "defaultValue": "New",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "New",
+                                   "value": "new"
+                               },
+                               {
+                                   "label": "Existing",
+                                   "value": "existing"
+                               }
+                           ]
+                       }
+                   },
+                   {
+                       "name": "databaseType",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Database Type",
+                       "toolTip": "Refer to LANSA documentation for an explanation of each Database Type and the supported versions of the database servers.",
+                       "defaultValue": "Azure SQL Database",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "SQL Server",
+                                   "value": "MSSQLS"
+                               },
+                               {
+                                   "label": "Azure SQL Database",
+                                   "value": "SQLAZURE"
+                               }
+                           ]
+                       },
+                       "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'existing')]"
+                   },
+                   {
+                       "name": "databaseServerName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Database Server Name",
+                       "toolTip": "The name of the existing Database Server to connect to. If the name has /MSSQLSERVER appended, omit it.",
+                       "defaultValue": "lansa",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'existing')]"
+                   },
+                   {
+                       "name": "databaseName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Database Name",
+                       "toolTip": "The name of the new database to create or name of the existing database to connect to.",
+                       "defaultValue": "lansa",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'existing')]"
+                   },
+                   {
+                       "name": "collation",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Collation",
+                       "toolTip": "The new database collation for governing the proper use of characters.",
+                       "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'new')]"
+                   },
+                   {
+                       "name": "edition",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Edition",
+                       "toolTip": "The type of database to create.",
+                       "defaultValue": "Standard",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "Serverless",
+                                   "value": "Serverless"
+                               },
+                               {
+                                   "label": "Basic",
+                                   "value": "Basic"
+                               },
+                               {
+                                   "label": "Standard",
+                                   "value": "Standard"
+                               },
+                               {
+                                   "label": "Premium",
+                                   "value": "Premium"
+                               }
+                           ]
+                       },
+                       "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'new')]"
+                   },
+                   {
+                       "name": "requestedServiceObjectiveNameBasic",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Requested Service Objective Name",
+                       "toolTip": "Describes the performance level for Edition",
+                       "defaultValue": "Basic",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "Basic",
+                                   "value": "Basic"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Basic'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
+                   },
+                   {
+                       "name": "requestedServiceObjectiveNameStandard",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Requested Service Objective Name",
+                       "toolTip": "Describes the performance level for Edition",
+                       "defaultValue": "S2",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "S0",
+                                   "value": "S0"
+                               },
+                               {
+                                   "label": "S1",
+                                   "value": "S1"
+                               },
+                               {
+                                   "label": "S2",
+                                   "value": "S2"
+                               },
+                               {
+                                   "label": "S3",
+                                   "value": "S3"
+                               },
+                               {
+                                   "label": "S4",
+                                   "value": "S4"
+                               },
+                               {
+                                   "label": "S6",
+                                   "value": "S6"
+                               },
+                               {
+                                   "label": "S7",
+                                   "value": "S7"
+                               },
+                               {
+                                   "label": "S9",
+                                   "value": "S9"
+                               },
+                               {
+                                   "label": "S12",
+                                   "value": "S12"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Standard'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
+                   },
+                   {
+                       "name": "requestedServiceObjectiveNamePremium",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Requested Service Objective Name",
+                       "toolTip": "Describes the performance level for Edition",
+                       "defaultValue": "P2",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "P1",
+                                   "value": "P1"
+                               },
+                               {
+                                   "label": "P2",
+                                   "value": "P2"
+                               },
+                               {
+                                   "label": "P4",
+                                   "value": "P4"
+                               },
+                               {
+                                   "label": "P6",
+                                   "value": "P6"
+                               },
+                               {
+                                   "label": "P11",
+                                   "value": "P11"
+                               },
+                               {
+                                   "label": "P15",
+                                   "value": "P15"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Premium'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
+                   },
+                   {
+                       "name": "serverlessDbCapacity",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Max vCores",
+                       "toolTip": "The maximum number of cores available to use in the database. [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). [Learn more about how Gen5 serverless parameters effect the resources available to the database server](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "1",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "1",
+                                   "value": 1
+                               },
+                               {
+                                   "label": "2",
+                                   "value": 2
+                               },
+                               {
+                                   "label": "4",
+                                   "value": 4
+                               },
+                               {
+                                   "label": "6",
+                                   "value": 6
+                               },
+                               {
+                                   "label": "8",
+                                   "value": 8
+                               },
+                               {
+                                   "label": "10",
+                                   "value": 10
+                               },
+                               {
+                                   "label": "12",
+                                   "value": 12
+                               },
+                               {
+                                   "label": "14",
+                                   "value": 14
+                               },
+                               {
+                                   "label": "16",
+                                   "value": 16
+                               },
+                               {
+                                   "label": "18",
+                                   "value": 18
+                               },
+                               {
+                                   "label": "20",
+                                   "value": 20
+                               },
+                               {
+                                   "label": "24",
+                                   "value": 24
+                               },
+                               {
+                                   "label": "32",
+                                   "value": 32
+                               },
+                               {
+                                   "label": "40",
+                                   "value": 40
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
+                   },
+                   {
+                       "name": "dbMinCapacity1",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "0.5",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "0.5",
+                                   "value": "0.5"
+                               },
+                               {
+                                   "label": "0.75",
+                                   "value": "0.75"
+                               },
+                               {
+                                   "label": "1.0",
+                                   "value": "1.0"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 1))]"
+                   },
+                   {
+                       "name": "dbMinCapacity2",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "0.5",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "0.5",
+                                   "value": "0.5"
+                               },
+                               {
+                                   "label": "0.75",
+                                   "value": "0.75"
+                               },
+                               {
+                                   "label": "1.0",
+                                   "value": "1.0"
+                               },
+                               {
+                                   "label": "1.25",
+                                   "value": "1.25"
+                               },
+                               {
+                                   "label": "1.5",
+                                   "value": "1.5"
+                               },
+                               {
+                                   "label": "1.75",
+                                   "value": "1.75"
+                               },
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 2))]"
+                   },
+                   {
+                       "name": "dbMinCapacity4",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "0.5",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "0.5",
+                                   "value": "0.5"
+                               },
+                               {
+                                   "label": "0.75",
+                                   "value": "0.75"
+                               },
+                               {
+                                   "label": "1.0",
+                                   "value": "1.0"
+                               },
+                               {
+                                   "label": "1.25",
+                                   "value": "1.25"
+                               },
+                               {
+                                   "label": "1.5",
+                                   "value": "1.5"
+                               },
+                               {
+                                   "label": "1.75",
+                                   "value": "1.75"
+                               },
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 4))]"
+                   },
+                   {
+                       "name": "dbMinCapacity6",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "0.75",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "0.75",
+                                   "value": "0.75"
+                               },
+                               {
+                                   "label": "1.0",
+                                   "value": "1.0"
+                               },
+                               {
+                                   "label": "1.25",
+                                   "value": "1.25"
+                               },
+                               {
+                                   "label": "1.5",
+                                   "value": "1.5"
+                               },
+                               {
+                                   "label": "1.75",
+                                   "value": "1.75"
+                               },
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 6))]"
+                   },
+                   {
+                       "name": "dbMinCapacity8",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "1.0",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "1.0",
+                                   "value": "1.0"
+                               },
+                               {
+                                   "label": "1.25",
+                                   "value": "1.25"
+                               },
+                               {
+                                   "label": "1.5",
+                                   "value": "1.5"
+                               },
+                               {
+                                   "label": "1.75",
+                                   "value": "1.75"
+                               },
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 8))]"
+                   },
+                   {
+                       "name": "dbMinCapacity10",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "1.25",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "1.25",
+                                   "value": "1.25"
+                               },
+                               {
+                                   "label": "1.5",
+                                   "value": "1.5"
+                               },
+                               {
+                                   "label": "1.75",
+                                   "value": "1.75"
+                               },
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 10))]"
+                   },
+                   {
+                       "name": "dbMinCapacity12",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "1.5",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "1.5",
+                                   "value": "1.5"
+                               },
+                               {
+                                   "label": "1.75",
+                                   "value": "1.75"
+                               },
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 12))]"
+                   },
+                   {
+                       "name": "dbMinCapacity14",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "1.75",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "1.75",
+                                   "value": "1.75"
+                               },
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               },
+                               {
+                                   "label": "14",
+                                   "value": "14"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 14))]"
+                   },
+                   {
+                       "name": "dbMinCapacity16",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "2",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               },
+                               {
+                                   "label": "14",
+                                   "value": "14"
+                               },
+                               {
+                                   "label": "16",
+                                   "value": "16"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 16))]"
+                   },
+                   {
+                       "name": "dbMinCapacity18",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "2.25",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "2.25",
+                                   "value": "2.25"
+                               },
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               },
+                               {
+                                   "label": "14",
+                                   "value": "14"
+                               },
+                               {
+                                   "label": "16",
+                                   "value": "16"
+                               },
+                               {
+                                   "label": "18",
+                                   "value": "18"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 18))]"
+                   },
+                   {
+                       "name": "dbMinCapacity20",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "2.5",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "2.5",
+                                   "value": "2.5"
+                               },
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               },
+                               {
+                                   "label": "14",
+                                   "value": "14"
+                               },
+                               {
+                                   "label": "16",
+                                   "value": "16"
+                               },
+                               {
+                                   "label": "18",
+                                   "value": "18"
+                               },
+                               {
+                                   "label": "20",
+                                   "value": "20"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 20))]"
+                   },
+                   {
+                       "name": "dbMinCapacity24",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "3",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "3",
+                                   "value": "3"
+                               },
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               },
+                               {
+                                   "label": "14",
+                                   "value": "14"
+                               },
+                               {
+                                   "label": "16",
+                                   "value": "16"
+                               },
+                               {
+                                   "label": "18",
+                                   "value": "18"
+                               },
+                               {
+                                   "label": "20",
+                                   "value": "20"
+                               },
+                               {
+                                   "label": "24",
+                                   "value": "24"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 24))]"
+                   },
+                   {
+                       "name": "dbMinCapacity32",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "4",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "4",
+                                   "value": "4"
+                               },
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               },
+                               {
+                                   "label": "14",
+                                   "value": "14"
+                               },
+                               {
+                                   "label": "16",
+                                   "value": "16"
+                               },
+                               {
+                                   "label": "18",
+                                   "value": "18"
+                               },
+                               {
+                                   "label": "20",
+                                   "value": "20"
+                               },
+                               {
+                                   "label": "24",
+                                   "value": "24"
+                               },
+                               {
+                                   "label": "32",
+                                   "value": "32"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 32))]"
+                   },
+                   {
+                       "name": "dbMinCapacity40",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Min vCores",
+                       "toolTip": "The minimum number of cores to use in the database. These cores will be the minimum charge except when the database server is paused.  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview). It must be less than or equal to Max vCores. Its minimum varies according to the Max vCores selected  [Learn more about the min-max vCore relationship in Gen5 servers](https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases)",
+                       "defaultValue": "5",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "5",
+                                   "value": "5"
+                               },
+                               {
+                                   "label": "6",
+                                   "value": "6"
+                               },
+                               {
+                                   "label": "8",
+                                   "value": "8"
+                               },
+                               {
+                                   "label": "10",
+                                   "value": "10"
+                               },
+                               {
+                                   "label": "12",
+                                   "value": "12"
+                               },
+                               {
+                                   "label": "14",
+                                   "value": "14"
+                               },
+                               {
+                                   "label": "16",
+                                   "value": "16"
+                               },
+                               {
+                                   "label": "18",
+                                   "value": "18"
+                               },
+                               {
+                                   "label": "20",
+                                   "value": "20"
+                               },
+                               {
+                                   "label": "24",
+                                   "value": "24"
+                               },
+                               {
+                                   "label": "32",
+                                   "value": "32"
+                               },
+                               {
+                                   "label": "40",
+                                   "value": "40"
+                               }
+                           ]
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').serverlessDbCapacity, 40))]"
+                   },
+                   {
+                       "name": "autoPauseDelay",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Auto Pause Delay",
+                       "toolTip": "Number of minutes to wait until pausing the database. Minimum 60. Maximum 10, 080 ( 7  days). Specify -1 to disable the delay  [Learn more about costing serverless compute](https://docs.microsoft.com/en-us/azure/azure-sql/database/serverless-tier-overview)",
+                       "defaultValue": "60",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(-1|[6-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|100[0-7][0-9]|10080)$",
+                           "validationMessage": "The value must be in range 60 - 10080 (7 days). Specify -1 to disable auto pause."
+                       },
+                       "visible": "[and(equals(steps('DatabaseConfig').edition, 'Serverless'), equals(steps('DatabaseConfig').databaseNewOrExisting, 'new'))]"
+                   },
+                   {
+                       "name": "maxSizeBytes",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Max Size Bytes",
+                       "toolTip": "The maximum size, in bytes, for the new database",
+                       "defaultValue": "1073741824",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^[0-9]+$",
+                           "validationMessage": "Numeric field."
+                       },
+                       "visible": "[equals(steps('DatabaseConfig').databaseNewOrExisting, 'new')]"
+                   },
+                   {
+                       "name": "databaseLogin",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Database Login",
+                       "toolTip": "The admin user of the Database",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "databaseLoginPassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Database Password",
+                           "confirmPassword": "Confirm Database Password"
+                       },
+                       "toolTip": "The password of the admin user of the Database",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true
+                       }
+                   }
+               ]
+           },
+           {
+               "name": "applicationGatewayConfig",
+               "label": "Application Gateway",
+               "subLabel": {
+                   "preValidation": "Configure the application gateway resources and settings",
+                   "postValidation": "Done"
+               },
+               "bladeTitle": "Application Gateway",
+               "elements": [
+                   {
+                       "name": "applicationGatewaySkuTier",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Application Gateway SKU Tier",
+                       "toolTip": "The v2 tiers offer performance enhancements and support for some critical new features. Choose a WAF tier to support Web Application Firewall on this Application Gateway. You can upgrade to a WAF tier after the application gateway has been created. [Learn more about tier differences](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-autoscaling-zone-redundant)",
+                       "defaultValue": "Standard_v2",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "Standard V2",
+                                   "value": "Standard_v2"
+                               },
+                               {
+                                   "label": "WAF V2",
+                                   "value": "WAF_v2"
+                               }
+                           ]
+                       }
+                   },
+                   {
+                       "name":"publicIpAddress",
+                       "type": "Microsoft.Network.PublicIpAddressCombo",
+                       "label": {
+                           "publicIpAddress": "Application Gateway Public IP address",
                            "domainNameLabel": "Domain name label"
-                        },
-                        "defaultValue": {
-                            "publicIpAddressName": "[toLower(concat(basics('stackName'),'-agpip'))]",
-                            "domainNameLabel": "[toLower(concat('ag', basics('stackName')))]"
-                        },
-                        "constraints": {
-                            "required": {
-                                "domainNameLabel": true
-                            }
-                        },
-                        "options": {
-                            "hideNone": true,
-                            "hideDomainNameLabel": false,
-                            "hideExisting": false
-                        }
-                    },
-                    {
-                        "name": "autoScalingEnabled",
-                        "type": "Microsoft.Common.OptionsGroup",
-                        "label": "Enable autoscaling",
-                        "defaultValue": "No",
-                        "toolTip": "Choose if autoscaling should be enabled or disabled",
-                        "constraints": {
-                            "allowedValues": [
-                                {
-                                    "label": "Yes",
-                                    "value": true
-                                },
-                                {
-                                    "label": "No",
-                                    "value": false
-                                }
-                            ],
-                            "required": true
-                        },
-                        "visible": "[or(equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard_v2'), equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF_v2'))]"
-                    },
-                    {
-                        "name": "applicationGatewayCapacity",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Application Gateway Capacity",
-                        "toolTip": "Number of Application Gateway instances",
-                        "defaultValue": "[int('2')]",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[not(and(or(equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard_v2'), equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF_v2')), equals(steps('applicationGatewayConfig').autoScalingEnabled, true)))]"
-                    },
-                    {
-                        "name": "autoScaleMinCapacity",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Minimum scale units",
-                        "toolTip": "Additional reserved capacity which is always maintained irrespective of traffic. 0 signifies purely autoscaling Application Gateway with no additional reserved capacity while still maintaining high availability of the service.",
-                        "defaultValue": "0",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('applicationGatewayConfig').autoScalingEnabled, true)]"
-                    },
-                    {
-                        "name": "autoScaleMaxCapacity",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Maximum scale units",
-                        "toolTip": "Upper bound on Application Gateway capacity",
-                        "defaultValue": "[int('10')]",
-                        "constraints": {
-                            "required": false,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('applicationGatewayConfig').autoScalingEnabled, true)]"
-                    },
-                    {
-                        "name": "zones",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Availability Zones",
-                        "toolTip": "Some regions support the ability to put your v2 application gateway in an availability zone (or multiple, for zone redundancy). If you are not sure, create an Application Gateway in the Portal and see if Availability Zones are listed for your Region. [Learn more about Availability Zones](https://aka.ms/aboutaz)",
-                        "placeholder": "None",
-                        "multiselect": true,
-                        "selectAll": false,
-                        "defaultValue": "['']",
-                        "constraints": {
-                            "required": false,
-                            "allowedValues":[
-                                {
-                                    "label": "Zone 1",
-                                    "value": "1"
-                                },
-                                {
-                                    "label": "Zone 2",
-                                    "value": "2"
-                                },
-                                {
-                                    "label": "Zone 3",
-                                    "value": "3"
-                                }
-                            ]
-                        },
-                        "visible": "[equals(steps('applicationGatewayConfig').autoScalingEnabled, true)]"
-                    }
-                ]
-            },
-            {
-                "name": "InstallationOptionsConfig",
-                "label": "Installation Options",
-                "subLabel": {
-                    "preValidation": "Configure the installation options",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "Installation Options",
-                "elements": [
-                    {
-                        "name": "installMSI",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Install MSI",
-                        "toolTip": "Install the MSI: Set this to 1 to execute an MSI install. Usually set to 0 when updating the stack",
-                        "defaultValue": "0",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "updateMSI",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Update MSI",
-                        "toolTip": "Update Stack: Set this to 1 to execute an MSI Upgrade. Obtains the specified MSI and installs it. Ensure the LansaMSI parameter is set correctly. If the LansaMSI parameter is not different a repair will be performed",
-                        "defaultValue": "0",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "uninstallMSI",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Uninstall MSI",
-                        "toolTip": "Uninstall the MSI: Set this to 1 to uninstall the MSI. The MSI used to uninstall, is the last one that was installed. It is called c:\\lansa\\MyApp.msi",
-                        "defaultValue": "0",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "triggerWebConfig",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Trigger Web Config",
-                        "toolTip": "Update Stack: Set this to 1 to update the web configuration",
-                        "defaultValue": "0",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "gitBranch",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Git Branch",
-                        "toolTip": "Git Branch",
-                        "defaultValue": "support/scalable",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "trace",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Trace",
-                        "toolTip": "Switch tracing on. Allowed values Y or N",
-                        "defaultValue": "No",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "Yes",
-                                    "value": "Y"
-                                },
-                                {
-                                    "label": "No",
-                                    "value": "N"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "fixLicense",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Fix License",
-                        "toolTip": "Re-run licensing. It is unlikely that this parameter needs to be used",
-                        "defaultValue": "0",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    }
-                ]
-            }
-        ],
-        "outputs": {
-            "location": "[location()]",
-            "stackName": "[basics('stackName')]",
-            "lansaVersion": "[basics('lansaVersion')]",
-            "msiURL": "[coalesce(basics('msiURLV14'), basics('msiURLV15'))]",
-            "osName": "[basics('osName')]",
-            "virtualMachineSize": "[basics('virtualMachineSize')]",
-            "dbVirtualMachineSize": "[basics('dbVirtualMachineSize')]",
-            "minimumInstanceCount": "[int(basics('minimumInstanceCount'))]",
-            "maximumInstanceCount": "[int(basics('maximumInstanceCount'))]",
-            "webServerMaxConnect": "[basics('webServerMaxConnect')]",
-            "certificateBase64Encoded": "[steps('SecurityConfig').certificateBase64Encoded]",
-            "certificatePassword": "[steps('SecurityConfig').certificatePassword]",
-            "keyVaultEnabled": "[steps('SecurityConfig').keyVaultEnabled]",
-            "keyVaultName": "[steps('SecurityConfig').keyVaultName]",
-            "keyVaultCertificateName": "[steps('SecurityConfig').keyVaultCertificateName]",
-            "keyVaultRGName": "[steps('SecurityConfig').keyVaultRGName]",
-            "adminUsername": "[steps('SecurityConfig').adminUsername]",
-            "adminPassword": "[steps('SecurityConfig').adminPassword]",
-            "webUsername": "[steps('SecurityConfig').webUsername]",
-            "webPassword": "[steps('SecurityConfig').webPassword]",
-            "databaseNewOrExisting": "[steps('DatabaseConfig').databaseNewOrExisting]",
-            "databaseType": "[steps('DatabaseConfig').databaseType]",
-            "databaseServerName": "[steps('DatabaseConfig').databaseServerName]",
-            "databaseName": "[steps('DatabaseConfig').databaseName]",
-            "collation": "[steps('DatabaseConfig').collation]",
-            "edition": "[steps('DatabaseConfig').edition]",
-            "requestedServiceObjectiveName": "[coalesce(steps('DatabaseConfig').requestedServiceObjectiveNameBasic, steps('DatabaseConfig').requestedServiceObjectiveNameStandard, steps('DatabaseConfig').requestedServiceObjectiveNamePremium)]",
-            "serverlessDbCapacity": "[steps('DatabaseConfig').serverlessDbCapacity]",
-            "dbMinCapacity": "[coalesce(steps('DatabaseConfig').dbMinCapacity1, steps('DatabaseConfig').dbMinCapacity2, steps('DatabaseConfig').dbMinCapacity4, steps('DatabaseConfig').dbMinCapacity6, steps('DatabaseConfig').dbMinCapacity8, steps('DatabaseConfig').dbMinCapacity10, steps('DatabaseConfig').dbMinCapacity12, steps('DatabaseConfig').dbMinCapacity14, steps('DatabaseConfig').dbMinCapacity16, steps('DatabaseConfig').dbMinCapacity18, steps('DatabaseConfig').dbMinCapacity20, steps('DatabaseConfig').dbMinCapacity24, steps('DatabaseConfig').dbMinCapacity32, steps('DatabaseConfig').dbMinCapacity40)]",
-            "autoPauseDelay": "[int(coalesce(steps('DatabaseConfig').autoPauseDelay, 60))]",
-            "maxSizeBytes": "[steps('DatabaseConfig').maxSizeBytes]",
-            "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
-            "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
-            "applicationGatewaySkuTier": "[steps('applicationGatewayConfig').applicationGatewaySkuTier]",
-            "applicationGatewaySkuName": "[coalesce(steps('applicationGatewayConfig').applicationGatewaySkuNameStandard, steps('applicationGatewayConfig').applicationGatewaySkuNameWAF)]",
-            "applicationGatewayCapacity": "[int(coalesce(steps('applicationGatewayConfig').applicationGatewayCapacity, 2))]",
-            "agpublicIpNewOrExisting": "[steps('applicationGatewayConfig').publicIpAddress.newOrExistingOrNone]",
-            "agpublicIpName": "[steps('applicationGatewayConfig').publicIpAddress.name]",
-            "agpublicIpDns": "[steps('applicationGatewayConfig').publicIpAddress.domainNameLabel]",
-            "agpublicIpResourceGroupName": "[steps('applicationGatewayConfig').publicIpAddress.resourceGroup]",
-            "agpublicIPAllocationMethod": "[steps('applicationGatewayConfig').publicIpAddress.publicIPAllocationMethod]",
-            "agpublicIpSku": "[steps('applicationGatewayConfig').publicIpAddress.sku]",
-            "enableAutoscaling": "[steps('applicationGatewayConfig').autoScalingEnabled]",
-            "autoScaleMinCapacity": "[int(coalesce(steps('applicationGatewayConfig').autoScaleMinCapacity, 0))]",
-            "autoScaleMaxCapacity": "[int(coalesce(steps('applicationGatewayConfig').autoScaleMaxCapacity, 10))]",
-            "availabilityZones": "[if(equals(steps('applicationGatewayConfig').zones, ''), steps('applicationGatewayConfig').zones, string(steps('applicationGatewayConfig').zones))]",
-            "installMSI": "[steps('InstallationOptionsConfig').installMSI]",
-            "updateMSI": "[steps('InstallationOptionsConfig').updateMSI]",
-            "uninstallMSI": "[steps('InstallationOptionsConfig').uninstallMSI]",
-            "triggerWebConfig": "[steps('InstallationOptionsConfig').triggerWebConfig]",
-            "gitBranch": "[steps('InstallationOptionsConfig').gitBranch]",
-            "trace": "[steps('InstallationOptionsConfig').trace]",
-            "fixLicense": "[steps('InstallationOptionsConfig').fixLicense]"
-        }
-    }
+                       },
+                       "toolTip": {
+                          "publicIpAddress": "Whether to use an existing public IP Address or create a new one",
+                          "domainNameLabel": "Domain name label"
+                       },
+                       "defaultValue": {
+                           "publicIpAddressName": "[toLower(concat(basics('stackName'),'-agpip'))]",
+                           "domainNameLabel": "[toLower(concat('ag', basics('stackName')))]"
+                       },
+                       "constraints": {
+                           "required": {
+                               "domainNameLabel": true
+                           }
+                       },
+                       "options": {
+                           "hideNone": true,
+                           "hideDomainNameLabel": false,
+                           "hideExisting": false
+                       }
+                   },
+                   {
+                       "name": "autoScalingEnabled",
+                       "type": "Microsoft.Common.OptionsGroup",
+                       "label": "Enable autoscaling",
+                       "defaultValue": "No",
+                       "toolTip": "Choose if autoscaling should be enabled or disabled",
+                       "constraints": {
+                           "allowedValues": [
+                               {
+                                   "label": "Yes",
+                                   "value": true
+                               },
+                               {
+                                   "label": "No",
+                                   "value": false
+                               }
+                           ],
+                           "required": true
+                       },
+                       "visible": "[or(equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard_v2'), equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF_v2'))]"
+                   },
+                   {
+                       "name": "applicationGatewayCapacity",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Application Gateway Capacity",
+                       "toolTip": "Number of Application Gateway instances",
+                       "defaultValue": "[int('2')]",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[not(and(or(equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'Standard_v2'), equals(steps('applicationGatewayConfig').applicationGatewaySkuTier, 'WAF_v2')), equals(steps('applicationGatewayConfig').autoScalingEnabled, true)))]"
+                   },
+                   {
+                       "name": "autoScaleMinCapacity",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Minimum scale units",
+                       "toolTip": "Additional reserved capacity which is always maintained irrespective of traffic. 0 signifies purely autoscaling Application Gateway with no additional reserved capacity while still maintaining high availability of the service.",
+                       "defaultValue": "0",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('applicationGatewayConfig').autoScalingEnabled, true)]"
+                   },
+                   {
+                       "name": "autoScaleMaxCapacity",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Maximum scale units",
+                       "toolTip": "Upper bound on Application Gateway capacity",
+                       "defaultValue": "[int('10')]",
+                       "constraints": {
+                           "required": false,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('applicationGatewayConfig').autoScalingEnabled, true)]"
+                   },
+                   {
+                       "name": "zones",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Availability Zones",
+                       "toolTip": "Some regions support the ability to put your v2 application gateway in an availability zone (or multiple, for zone redundancy). If you are not sure, create an Application Gateway in the Portal and see if Availability Zones are listed for your Region. [Learn more about Availability Zones](https://aka.ms/aboutaz)",
+                       "placeholder": "None",
+                       "multiselect": true,
+                       "selectAll": false,
+                       "defaultValue": "['']",
+                       "constraints": {
+                           "required": false,
+                           "allowedValues":[
+                               {
+                                   "label": "Zone 1",
+                                   "value": "1"
+                               },
+                               {
+                                   "label": "Zone 2",
+                                   "value": "2"
+                               },
+                               {
+                                   "label": "Zone 3",
+                                   "value": "3"
+                               }
+                           ]
+                       },
+                       "visible": "[equals(steps('applicationGatewayConfig').autoScalingEnabled, true)]"
+                   }
+               ]
+           },
+           {
+               "name": "InstallationOptionsConfig",
+               "label": "Installation Options",
+               "subLabel": {
+                   "preValidation": "Configure the installation options",
+                   "postValidation": "Done"
+               },
+               "bladeTitle": "Installation Options",
+               "elements": [
+                   {
+                       "name": "installMSI",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Install MSI",
+                       "toolTip": "Install the MSI: Set this to 1 to execute an MSI install. Usually set to 0 when updating the stack",
+                       "defaultValue": "0",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "updateMSI",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Update MSI",
+                       "toolTip": "Update Stack: Set this to 1 to execute an MSI Upgrade. Obtains the specified MSI and installs it. Ensure the LansaMSI parameter is set correctly. If the LansaMSI parameter is not different a repair will be performed",
+                       "defaultValue": "0",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "uninstallMSI",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Uninstall MSI",
+                       "toolTip": "Uninstall the MSI: Set this to 1 to uninstall the MSI. The MSI used to uninstall, is the last one that was installed. It is called c:\\lansa\\MyApp.msi",
+                       "defaultValue": "0",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "triggerWebConfig",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Trigger Web Config",
+                       "toolTip": "Update Stack: Set this to 1 to update the web configuration",
+                       "defaultValue": "0",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "gitBranch",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Git Branch",
+                       "toolTip": "Git Branch",
+                       "defaultValue": "support/scalable",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "trace",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Trace",
+                       "toolTip": "Switch tracing on. Allowed values Y or N",
+                       "defaultValue": "No",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "Yes",
+                                   "value": "Y"
+                               },
+                               {
+                                   "label": "No",
+                                   "value": "N"
+                               }
+                           ]
+                       }
+                   },
+                   {
+                       "name": "fixLicense",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Fix License",
+                       "toolTip": "Re-run licensing. It is unlikely that this parameter needs to be used",
+                       "defaultValue": "0",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   }
+               ]
+           }
+       ],
+       "outputs": {
+           "location": "[location()]",
+           "stackName": "[basics('stackName')]",
+           "lansaVersion": "[basics('lansaVersion')]",
+           "msiURL": "[coalesce(basics('msiURLV14'), basics('msiURLV15'))]",
+           "osName": "[basics('osName')]",
+           "virtualMachineSize": "[basics('virtualMachineSize')]",
+           "dbVirtualMachineSize": "[basics('dbVirtualMachineSize')]",
+           "minimumInstanceCount": "[int(basics('minimumInstanceCount'))]",
+           "maximumInstanceCount": "[int(basics('maximumInstanceCount'))]",
+           "webServerMaxConnect": "[basics('webServerMaxConnect')]",
+           "certificateBase64Encoded": "[steps('SecurityConfig').certificateBase64Encoded]",
+           "certificatePassword": "[steps('SecurityConfig').certificatePassword]",
+           "keyVaultEnabled": "[steps('SecurityConfig').keyVaultEnabled]",
+           "keyVaultName": "[steps('SecurityConfig').keyVaultName]",
+           "keyVaultCertificateName": "[steps('SecurityConfig').keyVaultCertificateName]",
+           "keyVaultRGName": "[steps('SecurityConfig').keyVaultRGName]",
+           "adminUsername": "[steps('SecurityConfig').adminUsername]",
+           "adminPassword": "[steps('SecurityConfig').adminPassword]",
+           "webUsername": "[steps('SecurityConfig').webUsername]",
+           "webPassword": "[steps('SecurityConfig').webPassword]",
+           "databaseNewOrExisting": "[steps('DatabaseConfig').databaseNewOrExisting]",
+           "databaseType": "[steps('DatabaseConfig').databaseType]",
+           "databaseServerName": "[steps('DatabaseConfig').databaseServerName]",
+           "databaseName": "[steps('DatabaseConfig').databaseName]",
+           "collation": "[steps('DatabaseConfig').collation]",
+           "edition": "[steps('DatabaseConfig').edition]",
+           "requestedServiceObjectiveName": "[coalesce(steps('DatabaseConfig').requestedServiceObjectiveNameBasic, steps('DatabaseConfig').requestedServiceObjectiveNameStandard, steps('DatabaseConfig').requestedServiceObjectiveNamePremium)]",
+           "serverlessDbCapacity": "[steps('DatabaseConfig').serverlessDbCapacity]",
+           "dbMinCapacity": "[coalesce(steps('DatabaseConfig').dbMinCapacity1, steps('DatabaseConfig').dbMinCapacity2, steps('DatabaseConfig').dbMinCapacity4, steps('DatabaseConfig').dbMinCapacity6, steps('DatabaseConfig').dbMinCapacity8, steps('DatabaseConfig').dbMinCapacity10, steps('DatabaseConfig').dbMinCapacity12, steps('DatabaseConfig').dbMinCapacity14, steps('DatabaseConfig').dbMinCapacity16, steps('DatabaseConfig').dbMinCapacity18, steps('DatabaseConfig').dbMinCapacity20, steps('DatabaseConfig').dbMinCapacity24, steps('DatabaseConfig').dbMinCapacity32, steps('DatabaseConfig').dbMinCapacity40)]",
+           "autoPauseDelay": "[int(coalesce(steps('DatabaseConfig').autoPauseDelay, 60))]",
+           "maxSizeBytes": "[steps('DatabaseConfig').maxSizeBytes]",
+           "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
+           "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
+           "applicationGatewaySkuTier": "[steps('applicationGatewayConfig').applicationGatewaySkuTier]",
+           "applicationGatewaySkuName": "[steps('applicationGatewayConfig').applicationGatewaySkuTier]",
+           "applicationGatewayCapacity": "[int(coalesce(steps('applicationGatewayConfig').applicationGatewayCapacity, 2))]",
+           "agpublicIpNewOrExisting": "[steps('applicationGatewayConfig').publicIpAddress.newOrExistingOrNone]",
+           "agpublicIpName": "[steps('applicationGatewayConfig').publicIpAddress.name]",
+           "agpublicIpDns": "[steps('applicationGatewayConfig').publicIpAddress.domainNameLabel]",
+           "agpublicIpResourceGroupName": "[steps('applicationGatewayConfig').publicIpAddress.resourceGroup]",
+           "agpublicIPAllocationMethod": "[steps('applicationGatewayConfig').publicIpAddress.publicIPAllocationMethod]",
+           "agpublicIpSku": "[steps('applicationGatewayConfig').publicIpAddress.sku]",
+           "enableAutoscaling": "[steps('applicationGatewayConfig').autoScalingEnabled]",
+           "autoScaleMinCapacity": "[int(coalesce(steps('applicationGatewayConfig').autoScaleMinCapacity, 0))]",
+           "autoScaleMaxCapacity": "[int(coalesce(steps('applicationGatewayConfig').autoScaleMaxCapacity, 10))]",
+           "availabilityZones": "[if(equals(steps('applicationGatewayConfig').zones, ''), steps('applicationGatewayConfig').zones, string(steps('applicationGatewayConfig').zones))]",
+           "installMSI": "[steps('InstallationOptionsConfig').installMSI]",
+           "updateMSI": "[steps('InstallationOptionsConfig').updateMSI]",
+           "uninstallMSI": "[steps('InstallationOptionsConfig').uninstallMSI]",
+           "triggerWebConfig": "[steps('InstallationOptionsConfig').triggerWebConfig]",
+           "gitBranch": "[steps('InstallationOptionsConfig').gitBranch]",
+           "trace": "[steps('InstallationOptionsConfig').trace]",
+           "fixLicense": "[steps('InstallationOptionsConfig').fixLicense]"
+       }
+   }
 }

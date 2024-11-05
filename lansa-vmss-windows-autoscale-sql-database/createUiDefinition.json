@@ -1746,7 +1746,6 @@
            "agpublicIpName": "[steps('applicationGatewayConfig').publicIpAddress.name]",
            "agpublicIpDns": "[steps('applicationGatewayConfig').publicIpAddress.domainNameLabel]",
            "agpublicIpResourceGroupName": "[steps('applicationGatewayConfig').publicIpAddress.resourceGroup]",
-           "agpublicIpSku": "[steps('applicationGatewayConfig').publicIpAddress.sku]",
            "enableAutoscaling": "[steps('applicationGatewayConfig').autoScalingEnabled]",
            "autoScaleMinCapacity": "[int(coalesce(steps('applicationGatewayConfig').autoScaleMinCapacity, 0))]",
            "autoScaleMaxCapacity": "[int(coalesce(steps('applicationGatewayConfig').autoScaleMaxCapacity, 10))]",

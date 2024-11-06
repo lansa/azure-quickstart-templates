@@ -1,349 +1,340 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
-    "handler": "Microsoft.Azure.CreateUIDef",
-    "version": "0.1.2-preview",
-    "parameters": {
-        "basics": [
-            {
-                "name": "stackType",
-                "type": "Microsoft.Common.DropDown",
-                "label": "Stack Type",
-                "toolTip": "Describes the type of the stack configuration",
-                "defaultValue": "Development Stack",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "Development Stack",
-                            "value": "Dev"
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "stackName",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Stack Name",
-                "toolTip": "String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended. Some identifiers use precisely 9 characters from this name and so it can be useful to use exactly 9. The template pads it out or truncates it as necessary to make it 9 characters long where required.",
-                "constraints": {
-                    "required": true,
-                    "regex": "^([a-zA-z-]{3,61})$",
-                    "validationMessage": "Only alphabets and hyphen are allowed, and the value must be 3-61 characters long."
-                }
-            },
-            {
-                "name": "lansaVersion",
-                "type": "Microsoft.Common.DropDown",
-                "label": "LANSA Version",
-                "toolTip": "Visual LANSA Version",
-                "defaultValue": "V15 GA",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "V15 GA",
-                            "value": "V15 GA"
-                        },
-                        {
-                            "label": "V14 SP2",
-                            "value": "V14 SP2"
-                        }
-                    ]
-                }
-            },
-            {
-                "name": "msiURLV15",
-                "type": "Microsoft.Common.TextBox",
-                "label": "MSI URL",
-                "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine.",
-                "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v15.0.21217_en-us.msi",
-                "constraints": {
-                    "required": true,
-                    "regex": "^(?!\\s*$).+",
-                    "validationMessage": "The value must not be empty."
-                },
-                "visible": "[equals(basics('lansaVersion'), 'V15 GA')]"
-            },
-            {
-                "name": "msiURLV14",
-                "type": "Microsoft.Common.TextBox",
-                "label": "MSI URL",
-                "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine.",
-                "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v14.2.21217_en-us.msi",
-                "constraints": {
-                    "required": true,
-                    "regex": "^(?!\\s*$).+",
-                    "validationMessage": "The value must not be empty."
-                },
-                "visible": "[equals(basics('lansaVersion'), 'V14 SP2')]"
-            },
-            {
-                "name": "osName",
-                "type": "Microsoft.Common.DropDown",
-                "label": "OS Name",
-                "toolTip": "Choose the Windows Server image version to use",
-                "defaultValue": "Windows Server 2022",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "Windows Server 2022",
-                            "value": "Windows Server 2022"
-                        },
-                        {
-                            "label": "Windows Server 2022 JPN",
-                            "value": "Windows Server 2022 JPN"
-                        },
-                        {
-                            "label": "Windows Server 2019",
-                            "value": "Windows Server 2019"
-                        },
-                        {
-                            "label": "Windows Server 2019 JPN",
-                            "value": "Windows Server 2019 JPN"
-                        },
-                        {
-                            "label": "Windows Server 2016",
-                            "value": "Windows Server 2016"
-                        },
-                        {
-                            "label": "Windows Server 2016 JPN",
-                            "value": "Windows Server 2016 JPN"
-                        }
-                    ]
-                }
-            }
-        ],
-        "steps": [
-            {
-                "name": "SecurityConfig",
-                "label": "Security",
-                "subLabel": {
-                    "preValidation": "Configurations regarding credentials",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "Security",
-                "elements": [
-                    {
-                        "name": "keyVaultEnabled",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Key Vault Enabled",
-                        "defaultValue": "True",
-                        "toolTip": "Set to true to use a Certificate created in Key Vault. Set to false to explicitly provide the certificate string",
-                        "constraints": {
-                            "required": true,
-                            "allowedValues":[
-                                {
-                                    "label": "True",
-                                    "value": "true"
-                                },
-                                {
-                                    "label": "False",
-                                    "value": "false"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "certificateBase64Encoded",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Certificate Base64Encoded",
-                        "toolTip": "Base 64 encoded String representing the SSL certificate",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
-                    },
-                    {
-                        "name": "certificatePassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Certificate Password",
-                            "confirmPassword": "Confirm Certificate Password"
-                        },
-                        "toolTip": "SSL certificate password",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
-                    },
-                    {
-                        "name": "keyVaultName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Key Vault Name",
-                        "toolTip": "Name of the Key Vault which contains the Certificate and Secret",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
-                    },
-                    {
-                        "name": "keyVaultCertificateName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Key Vault Certificate Name",
-                        "toolTip": "Name of the Certificate stored in Key Vault",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
-                    },
-                    {
-                        "name": "keyVaultRGName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Key Vault Resource Group Name",
-                        "toolTip": "Name of the Resource Group which contains the Key Vault",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        },
-                        "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
-                    },
-                    {
-                        "name": "adminUsername",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Admin Username",
-                        "toolTip": "Admin username on all VMs",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "adminPassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Admin Password",
-                            "confirmPassword": "Confirm Admin Password"
-                        },
-                        "toolTip": "Admin password on all VMs",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true,
-                            "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
-                            "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
-                        }
-                    },
-                    {
-                        "name": "webUsername",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Web Username",
-                        "toolTip": "Web Server username on all VMs. This should be different from Admin Username",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "webPassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Web Password",
-                            "confirmPassword": "Confirm Web Password"
-                        },
-                        "toolTip": "Web Server password on all VMs",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true,
-                            "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
-                            "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "DatabaseConfig",
-                "label": "Database",
-                "subLabel": {
-                    "preValidation": "Configure the database resources and settings",
-                    "postValidation": "Done"
-                },
-                "bladeTitle": "Database",
-                "elements": [
-                    {
-                        "name": "collation",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Collation",
-                        "toolTip": "The new database collation for governing the proper use of characters.",
-                        "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "databaseLogin",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Database Login",
-                        "toolTip": "The admin user of the Database",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^(?!\\s*$).+",
-                            "validationMessage": "The value must not be empty."
-                        }
-                    },
-                    {
-                        "name": "databaseLoginPassword",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password" : "Database Password",
-                            "confirmPassword": "Confirm Database Password"
-                        },
-                        "toolTip": "The password of the admin user of the Database",
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "constraints": {
-                            "required": true
-                        }
-                    }
-                ]
-            }
-        ],
-        "outputs": {
-            "location": "[location()]",
-            "stackName": "[basics('stackName')]",
-            "lansaVersion": "[basics('lansaVersion')]",
-            "msiURL": "[coalesce(basics('msiURLV14'), basics('msiURLV15'))]",
-            "osName": "[basics('osName')]",
-            "virtualMachineSize": "Standard_B4ms",
-            "dbVirtualMachineSize": "Standard_B2ms",
-            "certificateBase64Encoded": "[steps('SecurityConfig').certificateBase64Encoded]",
-            "certificatePassword": "[steps('SecurityConfig').certificatePassword]",
-            "keyVaultEnabled": "[steps('SecurityConfig').keyVaultEnabled]",
-            "keyVaultName": "[steps('SecurityConfig').keyVaultName]",
-            "keyVaultCertificateName": "[steps('SecurityConfig').keyVaultCertificateName]",
-            "keyVaultRGName": "[steps('SecurityConfig').keyVaultRGName]",
-            "adminUsername": "[steps('SecurityConfig').adminUsername]",
-            "adminPassword": "[steps('SecurityConfig').adminPassword]",
-            "webUsername": "[steps('SecurityConfig').webUsername]",
-            "webPassword": "[steps('SecurityConfig').webPassword]",
-            "collation": "[steps('DatabaseConfig').collation]",
-            "edition": "Serverless",
-            "serverlessDbCapacity": 1,
-            "dbMinCapacity": "0.5",
-            "maxSizeBytes": "10737418240",
-            "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
-            "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
-            "applicationGatewaySkuTier": "Standard_v2",
-            "applicationGatewaySkuName": "Standard_v2",
-            "applicationGatewayCapacity": 1
-        }
-    }
+   "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+   "handler": "Microsoft.Azure.CreateUIDef",
+   "version": "0.1.2-preview",
+   "parameters": {
+       "basics": [
+           {
+               "name": "stackType",
+               "type": "Microsoft.Common.TextBlock",
+           "options": {
+               "text": "This template creates a Development Stack."
+           }
+           },
+           {
+               "name": "stackName",
+               "type": "Microsoft.Common.TextBox",
+               "label": "Stack Name",
+               "toolTip": "String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended. Some identifiers use precisely 9 characters from this name and so it can be useful to use exactly 9. The template pads it out or truncates it as necessary to make it 9 characters long where required.",
+               "constraints": {
+                   "required": true,
+                   "regex": "^([a-zA-z-]{3,61})$",
+                   "validationMessage": "Only alphabets and hyphen are allowed, and the value must be 3-61 characters long."
+               }
+           },
+           {
+               "name": "lansaVersion",
+               "type": "Microsoft.Common.DropDown",
+               "label": "LANSA Version",
+               "toolTip": "Visual LANSA Version",
+               "defaultValue": "V15 GA",
+               "constraints": {
+                   "required": true,
+                   "allowedValues":[
+                       {
+                           "label": "V15 GA",
+                           "value": "V15 GA"
+                       },
+                       {
+                           "label": "V14 SP2",
+                           "value": "V14 SP2"
+                       }
+                   ]
+               }
+           },
+           {
+               "name": "msiURLV15",
+               "type": "Microsoft.Common.TextBox",
+               "label": "MSI URL",
+               "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine.",
+               "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v15.0.21217_en-us.msi",
+               "constraints": {
+                   "required": true,
+                   "regex": "^(?!\\s*$).+",
+                   "validationMessage": "The value must not be empty."
+               },
+               "visible": "[equals(basics('lansaVersion'), 'V15 GA')]"
+           },
+           {
+               "name": "msiURLV14",
+               "type": "Microsoft.Common.TextBox",
+               "label": "MSI URL",
+               "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine.",
+               "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v14.2.21217_en-us.msi",
+               "constraints": {
+                   "required": true,
+                   "regex": "^(?!\\s*$).+",
+                   "validationMessage": "The value must not be empty."
+               },
+               "visible": "[equals(basics('lansaVersion'), 'V14 SP2')]"
+           },
+           {
+               "name": "osName",
+               "type": "Microsoft.Common.DropDown",
+               "label": "OS Name",
+               "toolTip": "Choose the Windows Server image version to use",
+               "defaultValue": "Windows Server 2022",
+               "constraints": {
+                   "required": true,
+                   "allowedValues":[
+                       {
+                           "label": "Windows Server 2022",
+                           "value": "Windows Server 2022"
+                       },
+                       {
+                           "label": "Windows Server 2022 JPN",
+                           "value": "Windows Server 2022 JPN"
+                       },
+                       {
+                           "label": "Windows Server 2019",
+                           "value": "Windows Server 2019"
+                       },
+                       {
+                           "label": "Windows Server 2019 JPN",
+                           "value": "Windows Server 2019 JPN"
+                       },
+                       {
+                           "label": "Windows Server 2016",
+                           "value": "Windows Server 2016"
+                       },
+                       {
+                           "label": "Windows Server 2016 JPN",
+                           "value": "Windows Server 2016 JPN"
+                       }
+                   ]
+               }
+           }
+       ],
+       "steps": [
+           {
+               "name": "SecurityConfig",
+               "label": "Security",
+               "subLabel": {
+                   "preValidation": "Configurations regarding credentials",
+                   "postValidation": "Done"
+               },
+               "bladeTitle": "Security",
+               "elements": [
+                   {
+                       "name": "keyVaultEnabled",
+                       "type": "Microsoft.Common.DropDown",
+                       "label": "Key Vault Enabled",
+                       "defaultValue": "True",
+                       "toolTip": "Set to true to use a Certificate created in Key Vault. Set to false to explicitly provide the certificate string",
+                       "constraints": {
+                           "required": true,
+                           "allowedValues":[
+                               {
+                                   "label": "True",
+                                   "value": "true"
+                               },
+                               {
+                                   "label": "False",
+                                   "value": "false"
+                               }
+                           ]
+                       }
+                   },
+                   {
+                       "name": "certificateBase64Encoded",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Certificate Base64Encoded",
+                       "toolTip": "Base 64 encoded String representing the SSL certificate",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
+                   },
+                   {
+                       "name": "certificatePassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Certificate Password",
+                           "confirmPassword": "Confirm Certificate Password"
+                       },
+                       "toolTip": "SSL certificate password",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'false')]"
+                   },
+                   {
+                       "name": "keyVaultName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Key Vault Name",
+                       "toolTip": "Name of the Key Vault which contains the Certificate and Secret",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
+                   },
+                   {
+                       "name": "keyVaultCertificateName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Key Vault Certificate Name",
+                       "toolTip": "Name of the Certificate stored in Key Vault",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
+                   },
+                   {
+                       "name": "keyVaultRGName",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Key Vault Resource Group Name",
+                       "toolTip": "Name of the Resource Group which contains the Key Vault",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       },
+                       "visible": "[equals(steps('SecurityConfig').keyVaultEnabled, 'true')]"
+                   },
+                   {
+                       "name": "adminUsername",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Admin Username",
+                       "toolTip": "Admin username on all VMs",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "adminPassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Admin Password",
+                           "confirmPassword": "Confirm Admin Password"
+                       },
+                       "toolTip": "Admin password on all VMs",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true,
+                           "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
+                           "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
+                       }
+                   },
+                   {
+                       "name": "webUsername",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Web Username",
+                       "toolTip": "Web Server username on all VMs. This should be different from Admin Username",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "webPassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Web Password",
+                           "confirmPassword": "Confirm Web Password"
+                       },
+                       "toolTip": "Web Server password on all VMs",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true,
+                           "regex": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*]).{12,255})$",
+                           "validationMessage": "Password length should be 12-255 characters long, and have at least one number, one lower case, one upper case and one special character"
+                       }
+                   }
+               ]
+           },
+           {
+               "name": "DatabaseConfig",
+               "label": "Database",
+               "subLabel": {
+                   "preValidation": "Configure the database resources and settings",
+                   "postValidation": "Done"
+               },
+               "bladeTitle": "Database",
+               "elements": [
+                   {
+                       "name": "collation",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Collation",
+                       "toolTip": "The new database collation for governing the proper use of characters.",
+                       "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "databaseLogin",
+                       "type": "Microsoft.Common.TextBox",
+                       "label": "Database Login",
+                       "toolTip": "The admin user of the Database",
+                       "constraints": {
+                           "required": true,
+                           "regex": "^(?!\\s*$).+",
+                           "validationMessage": "The value must not be empty."
+                       }
+                   },
+                   {
+                       "name": "databaseLoginPassword",
+                       "type": "Microsoft.Common.PasswordBox",
+                       "label": {
+                           "password" : "Database Password",
+                           "confirmPassword": "Confirm Database Password"
+                       },
+                       "toolTip": "The password of the admin user of the Database",
+                       "options": {
+                           "hideConfirmation": false
+                       },
+                       "constraints": {
+                           "required": true
+                       }
+                   }
+               ]
+           }
+       ],
+       "outputs": {
+           "location": "[location()]",
+           "stackName": "[basics('stackName')]",
+           "lansaVersion": "[basics('lansaVersion')]",
+           "msiURL": "[coalesce(basics('msiURLV14'), basics('msiURLV15'))]",
+           "osName": "[basics('osName')]",
+           "virtualMachineSize": "Standard_B4ms",
+           "dbVirtualMachineSize": "Standard_B2ms",
+           "certificateBase64Encoded": "[steps('SecurityConfig').certificateBase64Encoded]",
+           "certificatePassword": "[steps('SecurityConfig').certificatePassword]",
+           "keyVaultEnabled": "[steps('SecurityConfig').keyVaultEnabled]",
+           "keyVaultName": "[steps('SecurityConfig').keyVaultName]",
+           "keyVaultCertificateName": "[steps('SecurityConfig').keyVaultCertificateName]",
+           "keyVaultRGName": "[steps('SecurityConfig').keyVaultRGName]",
+           "adminUsername": "[steps('SecurityConfig').adminUsername]",
+           "adminPassword": "[steps('SecurityConfig').adminPassword]",
+           "webUsername": "[steps('SecurityConfig').webUsername]",
+           "webPassword": "[steps('SecurityConfig').webPassword]",
+           "collation": "[steps('DatabaseConfig').collation]",
+           "edition": "Serverless",
+           "serverlessDbCapacity": 1,
+           "dbMinCapacity": "0.5",
+           "maxSizeBytes": "10737418240",
+           "databaseLogin": "[steps('DatabaseConfig').databaseLogin]",
+           "databaseLoginPassword": "[steps('DatabaseConfig').databaseLoginPassword]",
+           "applicationGatewaySkuTier": "Standard_v2",
+           "applicationGatewaySkuName": "Standard_v2",
+           "applicationGatewayCapacity": 1
+       }
+   }
 }

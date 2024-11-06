@@ -7,9 +7,9 @@
            {
                "name": "stackType",
                "type": "Microsoft.Common.TextBlock",
-           "options": {
-               "text": "This template creates a Development Stack."
-           }
+               "options": {
+                  "text": "This template creates a Development Stack."
+               }
            },
            {
                "name": "stackName",

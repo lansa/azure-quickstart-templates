@@ -5,20 +5,11 @@
     "parameters": {
         "basics": [
             {
-                "name": "stackType",
-                "type": "Microsoft.Common.DropDown",
-                "label": "Stack Type",
-                "toolTip": "Describes the type of the stack configuration",
-                "defaultValue": "Medium Stack",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "Medium Stack",
-                            "value": "Medium"
-                        }
-                    ]
-                }
+               "name": "stackType",
+               "type": "Microsoft.Common.TextBlock",
+               "options": {
+                  "text": "This template creates a Medium Production Stack."
+               }
             },
             {
                 "name": "stackName",

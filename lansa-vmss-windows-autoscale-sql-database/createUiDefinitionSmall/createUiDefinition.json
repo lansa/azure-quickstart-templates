@@ -5,20 +5,11 @@
     "parameters": {
         "basics": [
             {
-                "name": "stackType",
-                "type": "Microsoft.Common.DropDown",
-                "label": "Stack Type",
-                "toolTip": "Describes the type of the stack configuration",
-                "defaultValue": "Small Stack",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "Small Stack",
-                            "value": "Small"
-                        }
-                    ]
-                }
+               "name": "stackType",
+               "type": "Microsoft.Common.TextBlock",
+               "options": {
+                  "text": "This template creates a Small Production Stack."
+               }
             },
             {
                 "name": "stackName",

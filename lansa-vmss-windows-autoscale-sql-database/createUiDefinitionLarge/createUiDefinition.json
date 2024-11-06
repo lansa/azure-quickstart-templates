@@ -6,18 +6,9 @@
         "basics": [
             {
                 "name": "stackType",
-                "type": "Microsoft.Common.DropDown",
-                "label": "Stack Type",
-                "toolTip": "Describes the type of the stack configuration",
-                "defaultValue": "Large Stack",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "Large Stack",
-                            "value": "Large"
-                        }
-                    ]
+                "type": "Microsoft.Common.TextBlock",
+                "options": {
+                   "text": "This template creates a Large Production Stack."
                 }
             },
             {

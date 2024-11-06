@@ -5,20 +5,11 @@
     "parameters": {
         "basics": [
             {
-                "name": "stackType",
-                "type": "Microsoft.Common.DropDown",
-                "label": "Stack Type",
-                "toolTip": "Describes the type of the stack configuration",
-                "defaultValue": "Test Stack",
-                "constraints": {
-                    "required": true,
-                    "allowedValues":[
-                        {
-                            "label": "Test Stack",
-                            "value": "Test"
-                        }
-                    ]
-                }
+               "name": "stackType",
+               "type": "Microsoft.Common.TextBlock",
+               "options": {
+                  "text": "This template creates a Test Stack."
+               }
             },
             {
                 "name": "stackName",

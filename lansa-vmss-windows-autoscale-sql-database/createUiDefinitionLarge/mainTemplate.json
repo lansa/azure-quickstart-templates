@@ -630,7 +630,7 @@
    },
    "resources": [
         {
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2023-07-01",
             "name": "pid-0522366e-9eeb-4a58-bc01-1e19774ee147-partnercenter",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -645,7 +645,7 @@
        {
          "condition": "[equals(parameters('keyVaultEnabled'), 'true')]",
          "type": "Microsoft.Resources/deployments",
-         "apiVersion": "2020-06-01",
+         "apiVersion": "2023-07-01",
          "name": "dynamicSecret",
          "properties": {
             "mode": "Incremental",
@@ -681,7 +681,7 @@
          }
       },
     {
-      "apiVersion": "2019-11-01",
+      "apiVersion": "2023-06-01",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('frontEndNSGName')]",
       "location": "[parameters('location')]",
@@ -708,7 +708,7 @@
          "type": "Microsoft.Network/virtualNetworks",
          "name": "[variables('virtualNetworkName')]",
          "location": "[parameters('location')]",
-         "apiVersion": "2019-11-01",
+         "apiVersion": "2023-06-01",
          "dependsOn": [
             "[ResourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]"
          ],
@@ -741,7 +741,7 @@
          "type": "Microsoft.Network/publicIPAddresses",
          "name": "[variables('publicIPAddressName')]",
          "location": "[parameters('location')]",
-         "apiVersion": "2019-11-01",
+         "apiVersion": "2023-06-01",
          "sku": {
             "name": "Standard"
          },
@@ -756,7 +756,7 @@
          "type": "Microsoft.Network/loadBalancers",
          "name": "[variables('loadBalancerName')]",
          "location": "[parameters('location')]",
-         "apiVersion": "2019-11-01",
+         "apiVersion": "2023-06-01",
          "sku": {
             "name": "Standard"
          },
@@ -846,7 +846,7 @@
          "type": "Microsoft.Compute/virtualMachineScaleSets",
          "name": "[variables('dbvmssName')]",
          "location": "[parameters('location')]",
-         "apiVersion": "2019-12-01",
+         "apiVersion": "2023-09-01",
          "dependsOn": [
             "[ResourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
             "[ResourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
@@ -943,7 +943,7 @@
          "type": "Microsoft.Compute/virtualMachineScaleSets",
          "name": "[variables('namingInfix')]",
          "location": "[parameters('location')]",
-         "apiVersion": "2019-12-01",
+         "apiVersion": "2023-09-01",
          "dependsOn": [
             "[ResourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
             "[ResourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
@@ -1036,7 +1036,7 @@
       },
       {
          "type": "Microsoft.Insights/autoscaleSettings",
-         "apiVersion": "2015-04-01",
+         "apiVersion": "2023-01-01-preview",
          "name": "autoscalehost",
          "location": "[parameters('location')]",
          "dependsOn": [
@@ -1098,7 +1098,7 @@
       },
       {
          "type": "Microsoft.Insights/autoscaleSettings",
-         "apiVersion": "2015-04-01",
+         "apiVersion": "2023-01-01-preview",
          "name": "[variables('dbvmssName')]",
          "location": "[parameters('location')]",
          "dependsOn": [
@@ -1122,7 +1122,7 @@
       },
       {
          "condition": "[variables('isAgPublicIPNew')]",
-         "apiVersion": "2019-11-01",
+         "apiVersion": "2023-06-01",
          "type": "Microsoft.Network/publicIPAddresses",
          "name": "[variables('agPublicIPAddressName')]",
          "location": "[parameters('location')]",
@@ -1137,7 +1137,7 @@
          }
       },
       {
-         "apiVersion": "2019-11-01",
+         "apiVersion": "2023-06-01",
          "name": "[variables('agName')]",
          "type": "Microsoft.Network/applicationGateways",
          "location": "[parameters('location')]",
@@ -1255,7 +1255,7 @@
          "tags": {
             "displayName": "SqlServer"
          },
-         "apiVersion": "2019-06-01-preview",
+         "apiVersion": "2023-05-01-preview",
          "properties": {
             "administratorLogin": "[parameters('databaseLogin')]",
             "administratorLoginPassword": "[parameters('databaseLoginPassword')]",
@@ -1274,7 +1274,7 @@
                   "name": "[variables('dbSkuName')]",
                   "capacity": "[if(variables('isDatabaseServerless'), parameters('serverlessDbCapacity'), json('null'))]"
                },
-               "apiVersion": "2020-08-01-preview",
+               "apiVersion": "2023-05-01-preview",
                "dependsOn": [
                   "[variables('sqlserverName')]"
                ],
@@ -1288,7 +1288,7 @@
             {
                "condition": "[equals(parameters('databaseNewOrExisting'), 'new')]",
                "type": "firewallRules",
-               "apiVersion": "2019-06-01-preview",
+               "apiVersion": "2023-05-01-preview",
                "dependsOn": [
                   "[variables('sqlserverName')]"
                ],

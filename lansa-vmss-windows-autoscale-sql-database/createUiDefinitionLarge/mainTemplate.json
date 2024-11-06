@@ -1227,6 +1227,7 @@
                   "Name": "rule1",
                   "properties": {
                      "RuleType": "Basic",
+                     "Priority": 1,
                      "httpListener": {
                         "id": "[resourceId('Microsoft.Network/applicationgateways/httpListeners',variables('agName'),variables('agHttpListenerName'))]"
                      },

@@ -32,7 +32,7 @@ jobs:
   - checkout: self
   - task: PowerShell@2
     displayName: Download TTK & Expand Files
-    enabled: False
+    enabled: True
     inputs:
       targetType: inline
       script: >
@@ -56,7 +56,7 @@ jobs:
 
   - task: PowerShell@2
     displayName: Get Folder
-    enabled: False
+    enabled: True
     inputs:
       targetType: inline
       script: >+
@@ -71,7 +71,7 @@ jobs:
 
   - task: PowerShell@2
     displayName: Run Best Practice Tests
-    enabled: False
+    enabled: True
     inputs:
       targetType: inline
       script: "Import-Module $(ttk.folder)/arm-ttk/arm-ttk.psd1 -Verbose\n $testOutput = @(Test-AzTemplate -TemplatePath \"$(sample.folder)\\\\createUIDefinitionDev\")\n\n $testOutput += @(Test-AzTemplate -TemplatePath \"$(sample.folder)\\\\createUIDefinitionTest\")\n\n $testOutput += @(Test-AzTemplate -TemplatePath \"$(sample.folder)\\\\createUIDefinitionSmall\")\n\n $testOutput += @(Test-AzTemplate -TemplatePath \"$(sample.folder)\\\\createUIDefinitionMedium\")\n\n $testOutput += @(Test-AzTemplate -TemplatePath \"$(sample.folder)\\\\createUIDefinitionLarge\")\n\n$testOutput\n\nif ($testOutput | ? {$_.Errors }) {\n   exit 1 \n} else {\n    Write-Host \"##vso[task.setvariable variable=result.best.practice]$true\"\n    exit 0\n}\n"

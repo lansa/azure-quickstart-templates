@@ -1254,7 +1254,7 @@
       },
       {
          "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
-         "apiVersion": "2021-08-01",
+         "apiVersion": "2023-06-01",
          "name": "[variables('agFirewallPolicyName')]",
          "location": "[parameters('location')]",
          "properties": {

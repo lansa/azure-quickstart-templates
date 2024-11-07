@@ -628,7 +628,10 @@
       "agSslCertName": "appGatewaySslCert",
       "agBackendHttpSettingsName": "appGatewayBackendHttpSettings",
       "agBackendAddressPoolName": "[concat(variables('namingInfix'), '-agpool')]",
-      "agFirewallPolicyName": "[concat(variables('namingInfix'), '-agfirpol')]"
+      "agFirewallPolicyName": "[concat(variables('namingInfix'), '-agfirpol')]",
+      "agFirewallPolicyId": {
+         "id": "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName'))]"
+      }
    },
    "resources": [
         {
@@ -1222,9 +1225,7 @@
                      "SslCertificate": {
                         "Id": "[resourceId('Microsoft.Network/applicationgateways/sslCertificates',variables('agName'),variables('agSslCertName'))]"
                      },
-                     "firewallPolicy": {
-                        "id": "[if(variables('isWAFTier'), resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName')), json('null'))]"
-                     }
+                     "firewallPolicy": "[if(variables('isWAFTier'), variables('agFirewallPolicyId'), json('null'))]"
                   }
                }
             ],
@@ -1246,9 +1247,7 @@
                   }
                }
             ],
-            "firewallPolicy": {
-                "id": "[if(variables('isWAFTier'), resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName')), json('null'))]"
-            },
+            "firewallPolicy": "[if(variables('isWAFTier'), variables('agFirewallPolicyId'), json('null'))]",
             "autoscaleConfiguration": "[if(parameters('enableAutoscaling'), variables('autoScaleConfig'), json('null'))]"
          },
          "zones": "[if(and(equals(parameters('enableAutoscaling'), true()), greater(length(variables('zonesArray')), 0)), if(contains(variables('zonesArray'),''), json('null'), variables('zonesArray')), json('null'))]"

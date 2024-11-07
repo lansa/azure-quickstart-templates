@@ -490,6 +490,7 @@
    "variables": {
       "isCustomImage": "[equals(parameters('imageSource'), 'Custom')]",
       "addAGName" : "[or(equals(parameters('applicationGatewaySkuTier'), 'Standard'), equals(parameters('applicationGatewaySkuTier'), 'WAF'))]",
+      "isWAFTier": "[equals(parameters('applicationGatewaySkuTier'), 'WAF_v2')]",
       "autoScaleConfig" : {
          "minCapacity": "[parameters('autoScaleMinCapacity')]",
          "maxCapacity": "[parameters('autoScaleMaxCapacity')]"
@@ -1222,7 +1223,7 @@
                         "Id": "[resourceId('Microsoft.Network/applicationgateways/sslCertificates',variables('agName'),variables('agSslCertName'))]"
                      },
                      "firewallPolicy": {
-                        "id": "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName'))]"
+                        "id": "[if(variables('isWAFTier'), resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName')), json('null'))]"
                      }
                   }
                }
@@ -1246,13 +1247,14 @@
                }
             ],
             "firewallPolicy": {
-                "id": "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName'))]"
+                "id": "[if(variables('isWAFTier'), resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName')), json('null'))]"
             },
             "autoscaleConfiguration": "[if(parameters('enableAutoscaling'), variables('autoScaleConfig'), json('null'))]"
          },
          "zones": "[if(and(equals(parameters('enableAutoscaling'), true()), greater(length(variables('zonesArray')), 0)), if(contains(variables('zonesArray'),''), json('null'), variables('zonesArray')), json('null'))]"
       },
       {
+         "condition": "[variables('isWAFTier')]",
          "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
          "apiVersion": "2023-06-01",
          "name": "[variables('agFirewallPolicyName')]",

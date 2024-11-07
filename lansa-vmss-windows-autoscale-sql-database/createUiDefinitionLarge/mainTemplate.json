@@ -626,7 +626,8 @@
       "agFrontendPortName": "appGatewayFrontendPort",
       "agSslCertName": "appGatewaySslCert",
       "agBackendHttpSettingsName": "appGatewayBackendHttpSettings",
-      "agBackendAddressPoolName": "[concat(variables('namingInfix'), '-agpool')]"
+      "agBackendAddressPoolName": "[concat(variables('namingInfix'), '-agpool')]",
+      "agFirewallPolicyName": "[concat(variables('namingInfix'), '-agfirpol')]"
    },
    "resources": [
         {
@@ -1143,7 +1144,8 @@
          "location": "[parameters('location')]",
          "dependsOn": [
             "[ResourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-            "[coalesce(variables('agResourceDependsOn'), ResourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')))]"
+            "[coalesce(variables('agResourceDependsOn'), ResourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')))]",
+            "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName'))]"
          ],
          "properties": {
             "sku": {
@@ -1218,6 +1220,9 @@
                      "Protocol": "Https",
                      "SslCertificate": {
                         "Id": "[resourceId('Microsoft.Network/applicationgateways/sslCertificates',variables('agName'),variables('agSslCertName'))]"
+                     },
+                     "firewallPolicy": {
+                        "id": "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName'))]"
                      }
                   }
                }
@@ -1240,9 +1245,35 @@
                   }
                }
             ],
+            "firewallPolicy": {
+                "id": "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('agFirewallPolicyName'))]"
+            },
             "autoscaleConfiguration": "[if(parameters('enableAutoscaling'), variables('autoScaleConfig'), json('null'))]"
          },
          "zones": "[if(and(equals(parameters('enableAutoscaling'), true()), greater(length(variables('zonesArray')), 0)), if(contains(variables('zonesArray'),''), json('null'), variables('zonesArray')), json('null'))]"
+      },
+      {
+         "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+         "apiVersion": "2021-08-01",
+         "name": "[variables('agFirewallPolicyName')]",
+         "location": "[parameters('location')]",
+         "properties": {
+            "policySettings": {
+               "requestBodyCheck": true,
+               "maxRequestBodySizeInKb": 128,
+               "fileUploadLimitInMb": 100,
+               "state": "Enabled",
+               "mode": "Prevention"
+            },
+            "managedRules": {
+               "managedRuleSets": [
+                  {
+                  "ruleSetType": "OWASP",
+                  "ruleSetVersion": "3.1"
+                  }
+               ]
+            }
+         }
       },
       {
          "condition": "[equals(parameters('databaseNewOrExisting'), 'new')]",

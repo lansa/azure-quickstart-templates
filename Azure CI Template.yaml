@@ -3,9 +3,9 @@ name: CI-Templates-$(Build.BuildId)
 variables:
 - group: 'Template Parameters'
 - group: 'SKU Versions'
-- group: 'Default Branch' 
+- group: 'Default Branch'
 - group: 'Azure Logins'
-- name: CookbooksSource 
+- name: CookbooksSource
   value: $(Build.Repository.LocalPath)\cookbooks
 - name: ForceDeploy
   value: false
@@ -16,7 +16,7 @@ variables:
 - name: ttk.folder
   value: $(Agent.BuildDirectory)\test
 - name: resourcegroup
-  value: 'BakingDP-Templates-CI-Test'
+  value: 'BakingDP-CI-Templates'
 
 trigger: none
 
@@ -91,7 +91,7 @@ jobs:
       azurePowerShellVersion: LatestVersion
 
   - task: AzureResourceManagerTemplateDeployment@3
-    displayName: 'Deploy ARM Template : BakingDP-CITemplates'
+    displayName: Deploy ARM Template $(resourcegroup)
     condition: or(succeeded(), eq(variables['ForceDeploy'], 'True'))
     inputs:
       ConnectedServiceName: $(ConnectedServiceName)
@@ -99,11 +99,11 @@ jobs:
       resourceGroupName: $(resourcegroup)
       location: Australia East
       csmFile: lansa-vmss-windows-autoscale-sql-database/mainTemplate.json
-      overrideParameters: -osName "$(osName)" -lansaVersion "$(lansaVersion)" -msiURL $(msiURLv15) -stackName "build-$(Build.BuildNumber)" -certificateBase64Encoded "$(certificateBase64Encoded)" -certificatePassword "$(certificatePassword)" -databaseLogin "$(databaseLogin)" -databaseLoginPassword "$(databaseLoginPassword)" -adminUsername "$(adminUsername)" -adminPassword "$(adminPassword)" -webUsername "$(webUsername)" -webPassword "$(webPassword)" -gitBranch "debug/paas" -agpublicIpSku Standard -agpublicIpAllocationMethod Static
+      overrideParameters: -osName "$(osName)" -lansaVersion "$(lansaVersion)" -msiURL $(msiURLv15) -stackName "citmp$(Build.BuildId)" -certificateBase64Encoded "$(certificateBase64Encoded)" -certificatePassword "$(certificatePassword)" -databaseLogin "$(databaseLogin)" -databaseLoginPassword "$(databaseLoginPassword)" -adminUsername "$(adminUsername)" -adminPassword "$(adminPassword)" -webUsername "$(webUsername)" -webPassword "$(webPassword)" -gitBranch "debug/paas" -agpublicIpSku Standard -agpublicIpAllocationMethod Static
       deploymentName: TestTemplate
       deploymentOutputs: deploymentOutput
       addSpnToEnvironment: true
-      
+
   - task: maikvandergaag.maikvandergaag-azurergtag.azurergtag.azurergtag@1
     displayName: Azure Resource Group Tagging
     condition: always()

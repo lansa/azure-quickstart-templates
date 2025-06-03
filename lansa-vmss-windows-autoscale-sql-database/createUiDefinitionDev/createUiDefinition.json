@@ -27,7 +27,7 @@
                "type": "Microsoft.Common.DropDown",
                "label": "LANSA Version",
                "toolTip": "Visual LANSA Version",
-                "defaultValue": "V16 GA",
+               "defaultValue": "V16 GA",
                "constraints": {
                    "required": true,
                    "allowedValues":[

@@ -527,14 +527,14 @@
       "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), variables('lbFrontEndName'))]",
       "marketplaceSettings": {
 
-	"Windows Server 2022": {
+         "Windows Server 2022": {
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
                   "sku": "w22d-15-0"
                },
                "V14 SP2": {
-                  "sku": "w22d-14-2"
+                  "sku": "w22d-16-0"
                }
             }
          },
@@ -545,7 +545,7 @@
                   "sku": "w22d-15-0j"
                },
                "V14 SP2": {
-                  "sku": "w22d-14-2j"
+                  "sku": "w22d-16-0j"
                }
             }
          },
@@ -556,7 +556,7 @@
                   "sku": "w19d-15-0"
                },
                "V14 SP2": {
-                  "sku": "w19d-14-2"
+                  "sku": "w19d-16-0"
                }
             }
          },
@@ -567,7 +567,7 @@
                   "sku": "w19d-15-0j"
                },
                "V14 SP2": {
-                  "sku": "w19d-14-2j"
+                  "sku": "w19d-16-0j"
                }
             }
          },
@@ -578,7 +578,7 @@
                   "sku": "w16d-15-0"
                },
                "V14 SP2": {
-                  "sku": "w16d-14-2"
+                  "sku": "w16d-16-0"
                }
             }
          },
@@ -589,7 +589,7 @@
                   "sku": "w16d-15-0j"
                },
                "V14 SP2": {
-                  "sku": "w16d-14-2j"
+                  "sku": "w16d-16-0j"
                }
             }
          }

@@ -20,7 +20,7 @@
                "type": "Microsoft.Common.DropDown",
                "label": "LANSA Version",
                "toolTip": "Visual LANSA Version",
-               "defaultValue": "V15 GA",
+                "defaultValue": "V16 GA",
                "constraints": {
                    "required": true,
                    "allowedValues":[
@@ -29,8 +29,8 @@
                            "value": "V15 GA"
                        },
                        {
-                           "label": "V14 SP2",
-                           "value": "V14 SP2"
+                            "label": "V16 GA",
+                            "value": "V16 GA"
                        }
                    ]
                }
@@ -59,7 +59,7 @@
                    "regex": "^(?!\\s*$).+",
                    "validationMessage": "The value must not be empty."
                },
-               "visible": "[equals(basics('lansaVersion'), 'V14 SP2')]"
+                "visible": "[equals(basics('lansaVersion'), 'V16 GA')]"
            },
            {
                "name": "osName",
@@ -108,7 +108,7 @@
                "imageReference": {
                    "publisher": "lansa",
                    "offer": "lansa-scalable-license",
-                   "sku": "w22d-15-0"
+                   "sku": "w22d-16-0"
                },
                "count": "[int(basics('minimumInstanceCount'))]",
                "osPlatform": "Windows"
@@ -124,7 +124,7 @@
                "imageReference": {
                    "publisher": "lansa",
                    "offer": "lansa-scalable-license",
-                   "sku": "w22d-15-0"
+                   "sku": "w22d-16-0"
                },
                "count": 1,
                "osPlatform": "Windows"

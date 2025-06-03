@@ -526,8 +526,7 @@
       "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
       "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), variables('lbFrontEndName'))]",
       "marketplaceSettings": {
-
-	"Windows Server 2022": {
+      	"Windows Server 2022": {
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {

@@ -28,9 +28,9 @@
          "type": "string",
          "allowedValues": [
             "V15 GA",
-            "V14 SP2"
+            "V16 GA"
          ],
-         "defaultValue": "V15 GA",
+         "defaultValue": "V16 GA",
          "metadata": {
             "description": "Visual LANSA Version"
          }
@@ -526,15 +526,14 @@
       "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
       "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), variables('lbFrontEndName'))]",
       "marketplaceSettings": {
-
-	"Windows Server 2022": {
+      	"Windows Server 2022": {
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
                   "sku": "w22d-15-0"
                },
-               "V14 SP2": {
-                  "sku": "w22d-14-2"
+               "V16 GA": {
+                  "sku": "w22d-16-0"
                }
             }
          },
@@ -544,8 +543,8 @@
                "V15 GA": {
                   "sku": "w22d-15-0j"
                },
-               "V14 SP2": {
-                  "sku": "w22d-14-2j"
+               "V16 GA": {
+                  "sku": "w22d-16-0j"
                }
             }
          },
@@ -555,8 +554,8 @@
                "V15 GA": {
                   "sku": "w19d-15-0"
                },
-               "V14 SP2": {
-                  "sku": "w19d-14-2"
+               "V16 GA": {
+                  "sku": "w19d-16-0"
                }
             }
          },
@@ -566,8 +565,8 @@
                "V15 GA": {
                   "sku": "w19d-15-0j"
                },
-               "V14 SP2": {
-                  "sku": "w19d-14-2j"
+               "V16 GA": {
+                  "sku": "w19d-16-0j"
                }
             }
          },
@@ -577,8 +576,8 @@
                "V15 GA": {
                   "sku": "w16d-15-0"
                },
-               "V14 SP2": {
-                  "sku": "w16d-14-2"
+               "V16 GA": {
+                  "sku": "w16d-16-0"
                }
             }
          },
@@ -588,8 +587,8 @@
                "V15 GA": {
                   "sku": "w16d-15-0j"
                },
-               "V14 SP2": {
-                  "sku": "w16d-14-2j"
+               "V16 GA": {
+                  "sku": "w16d-16-0j"
                }
             }
          }

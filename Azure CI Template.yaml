@@ -104,15 +104,20 @@ jobs:
       deploymentOutputs: deploymentOutput
       addSpnToEnvironment: true
 
-  - task: maikvandergaag.maikvandergaag-azurergtag.azurergtag.azurergtag@1
-    displayName: Azure Resource Group Tagging
-    condition: always()
-    continueOnError: True
+  - task: AzurePowerShell@5
+    displayName: 'Tag RG'
+    env:
+      RESOURCEGROUP: $(resourcegroup)
     inputs:
-      ConnectedServiceName: $(ConnectedServiceName)
-      ResourceGroupName: $(resourcegroup)
-      Key: Usage
-      Value: test-temp
+      azureSubscription: $(ConnectedServiceName)
+      ScriptType: 'InlineScript'
+      Inline: |
+        Write-Host "Tagging $env:RESOURCEGROUP with Usage = 'test-temp'" | Out-Default | Write-Host
+        Set-AzResourceGroup -Name $env:RESOURCEGROUP -Tag @{ Usage = 'test-temp' }
+      azurePowerShellVersion: LatestVersion
+    continueOnError: true
+    condition: always()
+
   - task: PowerShell@2
     displayName: Print Deployment Output
     condition: or(succeeded(), eq(variables['ForceDeploy'], 'True'))

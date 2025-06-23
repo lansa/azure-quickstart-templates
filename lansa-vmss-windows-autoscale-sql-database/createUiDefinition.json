@@ -49,11 +49,11 @@
                "visible": "[equals(basics('lansaVersion'), 'V15 GA')]"
            },
            {
-               "name": "msiURLV14",
+               "name": "msiURLV16",
                "type": "Microsoft.Common.TextBox",
                "label": "MSI URL",
                "toolTip": "URL of the LANSA MSI which will be installed on each virtual machine. A demonstration MSI is provided as a default value and this should not be used for any other purpose",
-               "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v14.2.21217_en-us.msi",
+               "defaultValue": "https://stagingdpauseast.blob.core.windows.net/app/test/AWAMAPP_v16.0.0_en-us.msi",
                "constraints": {
                    "required": true,
                    "regex": "^(?!\\s*$).+",
@@ -1709,7 +1709,7 @@
            "location": "[location()]",
            "stackName": "[basics('stackName')]",
            "lansaVersion": "[basics('lansaVersion')]",
-           "msiURL": "[coalesce(basics('msiURLV14'), basics('msiURLV15'))]",
+           "msiURL": "[coalesce(basics('msiURLV16'), basics('msiURLV15'))]",
            "osName": "[basics('osName')]",
            "virtualMachineSize": "[basics('virtualMachineSize')]",
            "dbVirtualMachineSize": "[basics('dbVirtualMachineSize')]",

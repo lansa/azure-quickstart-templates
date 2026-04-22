@@ -167,7 +167,7 @@ jobs:
 
         forEach($url in $urls) {
             try{
-                $response = Invoke-WebRequest -Uri $url -TimeoutSec 14
+                $response = Invoke-WebRequest -Uri $url -TimeoutSec 14 -UseBasicParsing
                 $ResponseCode = $response.StatusCode
                 if($ResponseCode -ne 200) {
                     Write-Host "Response code not equal to 200: $ResponseCode" | Out-Default | Write-Verbose

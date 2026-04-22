@@ -12,14 +12,14 @@
       "osName": {
          "type": "string",
          "allowedValues": [
+            "Windows Server 2025",
+            "Windows Server 2025 JPN",
             "Windows Server 2022",
             "Windows Server 2022 JPN",
             "Windows Server 2019",
-            "Windows Server 2019 JPN",
-            "Windows Server 2016",
-            "Windows Server 2016 JPN"
+            "Windows Server 2019 JPN"
          ],
-         "defaultValue": "Windows Server 2022",
+         "defaultValue": "Windows Server 2025",
          "metadata": {
             "description": "Choose the Windows Server image version to use "
          }
@@ -526,6 +526,28 @@
       "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
       "frontEndIPConfigID": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('loadBalancerName'), variables('lbFrontEndName'))]",
       "marketplaceSettings": {
+         "Windows Server 2025": {
+            "offer": "lansa-scalable-license",
+            "version": {
+               "V15 GA": {
+                  "sku": "w25d-15-0"
+               },
+               "V16 GA": {
+                  "sku": "w25d-16-0"
+               }
+            }
+         },
+         "Windows Server 2025 JPN": {
+            "offer": "lansa-scalable-license",
+            "version": {
+               "V15 GA": {
+                  "sku": "w25d-15-0j"
+               },
+               "V16 GA": {
+                  "sku": "w25d-16-0j"
+               }
+            }
+         },
 	      "Windows Server 2022": {
             "offer": "lansa-scalable-license",
             "version": {
@@ -567,28 +589,6 @@
                },
                "V16 GA": {
                   "sku": "w19d-16-0j"
-               }
-            }
-         },
-         "Windows Server 2016": {
-            "offer": "lansa-scalable-license",
-            "version": {
-               "V15 GA": {
-                  "sku": "w16d-15-0"
-               },
-               "V16 GA": {
-                  "sku": "w16d-16-0"
-               }
-            }
-         },
-         "Windows Server 2016 JPN": {
-            "offer": "lansa-scalable-license",
-            "version": {
-               "V15 GA": {
-                  "sku": "w16d-15-0j"
-               },
-               "V16 GA": {
-                  "sku": "w16d-16-0j"
                }
             }
          }

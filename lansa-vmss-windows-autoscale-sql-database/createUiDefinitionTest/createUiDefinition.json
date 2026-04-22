@@ -73,10 +73,18 @@
                 "type": "Microsoft.Common.DropDown",
                 "label": "OS Name",
                 "toolTip": "Choose the Windows Server image version to use",
-                "defaultValue": "Windows Server 2022",
+                "defaultValue": "Windows Server 2025",
                 "constraints": {
                     "required": true,
                     "allowedValues":[
+                        {
+                           "label": "Windows Server 2025",
+                           "value": "Windows Server 2025"
+                        },
+                        {
+                           "label": "Windows Server 2025 JPN",
+                           "value": "Windows Server 2025 JPN"
+                        },
                         {
                             "label": "Windows Server 2022",
                             "value": "Windows Server 2022"
@@ -92,14 +100,6 @@
                         {
                             "label": "Windows Server 2019 JPN",
                             "value": "Windows Server 2019 JPN"
-                        },
-                        {
-                            "label": "Windows Server 2016",
-                            "value": "Windows Server 2016"
-                        },
-                        {
-                            "label": "Windows Server 2016 JPN",
-                            "value": "Windows Server 2016 JPN"
                         }
                      ]
                 }

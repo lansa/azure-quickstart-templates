@@ -17,6 +17,8 @@ variables:
   value: $(Agent.BuildDirectory)\test
 - name: resourcegroup
   value: 'BakingDP-CI-Templates'
+- name: vmGeneration
+  value: 'Gen 1'
 
 trigger: none
 
@@ -99,7 +101,7 @@ jobs:
       resourceGroupName: $(resourcegroup)
       location: Australia East
       csmFile: lansa-vmss-windows-autoscale-sql-database/mainTemplate.json
-      overrideParameters: -osName "$(osName)" -lansaVersion "$(lansaVersion)" -msiURL $(msiURLv15) -stackName "citmp$(Build.BuildId)" -certificateBase64Encoded "$(certificateBase64Encoded)" -certificatePassword "$(certificatePassword)" -databaseLogin "$(databaseLogin)" -databaseLoginPassword "$(databaseLoginPassword)" -adminUsername "$(adminUsername)" -adminPassword "$(adminPassword)" -webUsername "$(webUsername)" -webPassword "$(webPassword)" -gitBranch "debug/paas" -agpublicIpSku Standard -agpublicIpAllocationMethod Static
+      overrideParameters: -osName "$(osName)" -vmGeneration "$(vmGeneration)" -lansaVersion "$(lansaVersion)" -msiURL $(msiURLv15) -stackName "citmp$(Build.BuildId)" -certificateBase64Encoded "$(certificateBase64Encoded)" -certificatePassword "$(certificatePassword)" -databaseLogin "$(databaseLogin)" -databaseLoginPassword "$(databaseLoginPassword)" -adminUsername "$(adminUsername)" -adminPassword "$(adminPassword)" -webUsername "$(webUsername)" -webPassword "$(webPassword)" -gitBranch "debug/paas" -agpublicIpSku Standard -agpublicIpAllocationMethod Static
       deploymentName: TestTemplate
       deploymentOutputs: deploymentOutput
       addSpnToEnvironment: true

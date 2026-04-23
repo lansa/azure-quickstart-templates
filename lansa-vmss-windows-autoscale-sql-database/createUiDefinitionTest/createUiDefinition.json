@@ -72,7 +72,7 @@
                 "name": "osName",
                 "type": "Microsoft.Common.DropDown",
                 "label": "OS Name",
-                "toolTip": "Choose the Windows Server image version to use",
+                "toolTip": "Choose the Windows Server image version to use. Windows Server 2025 is Gen 2 only. Windows Server 2022 and 2019 support Gen 1 and Gen 2 (selectable below).",
                 "defaultValue": "Windows Server 2025",
                 "constraints": {
                     "required": true,
@@ -102,6 +102,18 @@
                             "value": "Windows Server 2019 JPN"
                         }
                      ]
+                }
+            },
+            {
+                "name": "vmGeneration",
+                "type": "Microsoft.Common.DropDown",
+                "label": "VM Generation",
+                "toolTip": "Gen 2 supports Trusted Launch (Secure Boot, vTPM). Only applicable for Windows Server 2022 and 2019. Windows Server 2025 is Gen 2 only.",
+                "defaultValue": "Gen 2",
+                "visible": true,
+                "constraints": {
+                    "required": true,
+                    "allowedValues": "[if(or(contains(basics('osName'), '2022'), contains(basics('osName'), '2019')), createArray(createObject('label', 'Gen 1', 'value', 'Gen 1'), createObject('label', 'Gen 2 (Trusted Launch)', 'value', 'Gen 2')), createArray(createObject('label', 'Gen 2 (only option for Windows Server 2025)', 'value', 'Gen 2')))]"
                 }
             }
         ],
@@ -313,6 +325,7 @@
             "lansaVersion": "[basics('lansaVersion')]",
             "msiURL": "[coalesce(basics('msiURLV16'), basics('msiURLV15'))]",
             "osName": "[basics('osName')]",
+            "vmGeneration": "[basics('vmGeneration')]",
             "virtualMachineSize": "Standard_B4ms",
             "dbVirtualMachineSize": "Standard_B2ms",
             "certificateBase64Encoded": "[steps('SecurityConfig').certificateBase64Encoded]",

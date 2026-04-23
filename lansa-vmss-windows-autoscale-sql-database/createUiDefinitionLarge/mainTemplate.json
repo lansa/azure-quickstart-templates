@@ -21,7 +21,18 @@
          ],
          "defaultValue": "Windows Server 2025",
          "metadata": {
-            "description": "Choose the Windows Server image version to use "
+            "description": "Choose the Windows Server image version to use. Windows Server 2025 is Gen 2 only. Windows Server 2022 and 2019 support Gen 1 and Gen 2."
+         }
+      },
+      "vmGeneration": {
+         "type": "string",
+         "defaultValue": "Gen 2",
+         "allowedValues": [
+            "Gen 1",
+            "Gen 2"
+         ],
+         "metadata": {
+            "description": "VM Generation. Gen 2 supports Trusted Launch (Secure Boot, vTPM). Windows Server 2025 is Gen 2 only and ignores this parameter."
          }
       },
       "lansaVersion": {
@@ -530,10 +541,10 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w25d-15-0"
+                  "sku": "w25d-15-0-g2"
                },
                "V16 GA": {
-                  "sku": "w25d-16-0"
+                  "sku": "w25d-16-0-g2"
                }
             }
          },
@@ -541,21 +552,23 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w25d-15-0j"
+                  "sku": "w25d-15-0j-g2"
                },
                "V16 GA": {
-                  "sku": "w25d-16-0j"
+                  "sku": "w25d-16-0j-g2"
                }
             }
          },
-      	"Windows Server 2022": {
+	      "Windows Server 2022": {
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w22d-15-0"
+                  "Gen 1": { "sku": "w22d-15-0" },
+                  "Gen 2": { "sku": "w22d-15-0-g2" }
                },
                "V16 GA": {
-                  "sku": "w22d-16-0"
+                  "Gen 1": { "sku": "w22d-16-0" },
+                  "Gen 2": { "sku": "w22d-16-0-g2" }
                }
             }
          },
@@ -563,10 +576,12 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w22d-15-0j"
+                  "Gen 1": { "sku": "w22d-15-0j" },
+                  "Gen 2": { "sku": "w22d-15-0j-g2" }
                },
                "V16 GA": {
-                  "sku": "w22d-16-0j"
+                  "Gen 1": { "sku": "w22d-16-0j" },
+                  "Gen 2": { "sku": "w22d-16-0j-g2" }
                }
             }
          },
@@ -574,10 +589,12 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w19d-15-0"
+                  "Gen 1": { "sku": "w19d-15-0" },
+                  "Gen 2": { "sku": "w19d-15-0-g2" }
                },
                "V16 GA": {
-                  "sku": "w19d-16-0"
+                  "Gen 1": { "sku": "w19d-16-0" },
+                  "Gen 2": { "sku": "w19d-16-0-g2" }
                }
             }
          },
@@ -585,16 +602,19 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w19d-15-0j"
+                  "Gen 1": { "sku": "w19d-15-0j" },
+                  "Gen 2": { "sku": "w19d-15-0j-g2" }
                },
                "V16 GA": {
-                  "sku": "w19d-16-0j"
+                  "Gen 1": { "sku": "w19d-16-0j" },
+                  "Gen 2": { "sku": "w19d-16-0j-g2" }
                }
             }
          }
       },
       "imagePublisher": "lansa",
-      "imageSku": "[variables('marketplaceSettings')[parameters('osName')].version[parameters('lansaVersion')].sku]",
+      "hasGenChoice": "[or(contains(parameters('osName'), '2022'), contains(parameters('osName'), '2019'))]",
+      "imageSku": "[if(variables('hasGenChoice'), variables('marketplaceSettings')[parameters('osName')].version[parameters('lansaVersion')][parameters('vmGeneration')].sku, variables('marketplaceSettings')[parameters('osName')].version[parameters('lansaVersion')].sku)]",
       "imageOfferName": "[concat(variables('marketplaceSettings')[parameters('osName')].offer, if (variables('isPreview'), '-preview', ''))]",
       "osType": {
          "publisher": "[variables('imagePublisher')]",

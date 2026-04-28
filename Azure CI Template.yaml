@@ -195,28 +195,24 @@ jobs:
     inputs:
       ConnectedServiceNameARM: $(ConnectedServiceName)
       ScriptType: InlineScript
-      Inline: >-
+      Inline: |-
         Install-Module -Name Az.Compute -AllowClobber -Force
 
         # $VersionText should be incremented to be the value of the NEXT image version published.
         # But here we need a published version, so subtract one from the current version number to get the last published version.
 
         $SkuName = "w22d-15-0-$($(VersionText)-1)"
-
         $var=ConvertFrom-Json '$(deploymentOutput)'
 
         # Download TestImageVersion PS Script
         New-Item -Path "$(CookbooksSource)\Tests\Tests" -ItemType Directory -verbose
-
         Invoke-WebRequest -Uri "https://raw.githubusercontent.com/robe070/cookbooks/$(CookbooksBranch)/Tests/TestImageVersion.ps1" -OutFile "$(CookbooksSource)\Tests\TestImageVersion.ps1" -verbose
 
         $vmssName = $var.scalesetName.value
-
-        Write-Host $vmssName | Out-Default
+        Write-Host "vmssName = $vmssName"
 
         # Execute the TestImageVersion PS Script
         Write-Host "Test the image version $SkuName by executing the script in the VMSS $vmssName" | Out-Default | Write-Verbose
-
         $result = Invoke-AzVmssVMRunCommand -ResourceGroupName "$(resourcegroup)" -VMScaleSetName $vmssName -InstanceId '0' -CommandId 'RunPowerShellScript' -ScriptPath "$(Build.Repository.LocalPath)\cookbooks\Tests\TestImageVersion.ps1" -Parameter @{ImgName = $SkuName}
 
         $result | Out-Default | Write-Host

@@ -108,12 +108,21 @@
                 "name": "vmGeneration",
                 "type": "Microsoft.Common.DropDown",
                 "label": "VM Generation",
-                "toolTip": "Gen 2 supports Trusted Launch (Secure Boot, vTPM). Only applicable for Windows Server 2022 and 2019. Windows Server 2025 is Gen 2 only.",
+                "toolTip": "Gen 2 supports Trusted Launch (Secure Boot, vTPM). Only Gen 2 images are being updated. Windows Server 2022 and 2019 may be Gen 1 or Gen 2. Windows Server 2025 is Gen 2 only.",
                 "defaultValue": "Gen 2",
-                "visible": true,
+                "visible": "[or(contains(basics('osName'), '2022'), contains(basics('osName'), '2019'))]",
                 "constraints": {
                     "required": true,
-                    "allowedValues": "[if(or(contains(basics('osName'), '2022'), contains(basics('osName'), '2019')), createArray(createObject('label', 'Gen 1', 'value', 'Gen 1'), createObject('label', 'Gen 2 (Trusted Launch)', 'value', 'Gen 2')), createArray(createObject('label', 'Gen 2 (only option for Windows Server 2025)', 'value', 'Gen 2')))]"
+                    "allowedValues":[
+                        {
+                           "label": "Gen 1",
+                           "value": "Gen 1"
+                        },
+                        {
+                           "label": "Gen 2",
+                           "value": "Gen 2"
+                        }
+                     ]
                 }
             }
         ],

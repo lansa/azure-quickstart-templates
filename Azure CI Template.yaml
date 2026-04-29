@@ -35,22 +35,17 @@ jobs:
     enabled: True
     inputs:
       targetType: inline
-      script: >
+      script: |
         New-Item -Path $(ttk.folder) -ItemType Directory -verbose
-
         Invoke-WebRequest -Uri "https://aka.ms/arm-ttk-marketplace" -OutFile "$(ttk.folder)\$(ttk.asset.filename)" -verbose
 
-
         # Expand the TTK files
-
         Get-ChildItem "$(ttk.folder)" -Recurse
 
         Write-Host "Expanding files..."
-
         Expand-Archive -Path "$(ttk.folder)\*.zip" -DestinationPath "$(ttk.folder)" -Verbose
 
         Write-Host "Expanded files found:"
-
         Get-ChildItem "$(ttk.folder)" -Recurse
       pwsh: true
 
@@ -59,12 +54,9 @@ jobs:
     enabled: True
     inputs:
       targetType: inline
-      script: >+
+      script: |
         # set this to a folder in the repo
-
         $fullpath = "$env:BUILD_SOURCESDIRECTORY\lansa-vmss-windows-autoscale-sql-database"
-
-
         Write-Host "##vso[task.setvariable variable=sample.folder]$fullpath"
 
       pwsh: true
@@ -123,30 +115,22 @@ jobs:
     condition: or(succeeded(), eq(variables['ForceDeploy'], 'True'))
     inputs:
       targetType: inline
-      script: >-
+      script: |
         # Print the Deployment Output
-
         Write-Host "$(deploymentOutput)" | out-default | Write-Verbose
   - task: PowerShell@2
     displayName: 'Test ARM Deployment : URL Tests'
     condition: or(succeeded(), eq(variables['ForceDeploy'], 'True'))
     inputs:
       targetType: inline
-      script: >-
+      script: |
         # Use the deployment output to extract the IpAddress
-
         $deploymentOutput=ConvertFrom-Json '$(deploymentOutput)'
-
         $IpAddress = $deploymentOutput.lbFqdn.value
-
         $url1 = "$IpAddress/cgi-bin/probe"
-
         $url2 = "$IpAddress/cgi-bin/lansaweb?about"
-
         $url3 = "$IpAddress/cgi-bin/lansaweb?wam=DEPTABWA&webrtn=BuildFirst&ml=LANSA:XHTML&part=DEX&lang=ENG"
-
         $url4 = "$IpAddress/cgi-bin/lansaweb?wam=JSMLICE&webrtn=weblic&ml=LANSA:XHTML&part=DEX&lang=ENG"
-
         $urls = @($url1, $url2, $url3, $url4)
 
         add-type @"
@@ -164,7 +148,6 @@ jobs:
         [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
         $failureCount = 0
-
         forEach($url in $urls) {
             try{
                 $response = Invoke-WebRequest -Uri $url -TimeoutSec 14 -UseBasicParsing
@@ -195,7 +178,7 @@ jobs:
     inputs:
       ConnectedServiceNameARM: $(ConnectedServiceName)
       ScriptType: InlineScript
-      Inline: |-
+      Inline: |
         Install-Module -Name Az.Compute -AllowClobber -Force
 
         # $VersionText should be incremented to be the value of the NEXT image version published.

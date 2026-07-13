@@ -631,6 +631,15 @@
          "product": "[variables('imageOfferName')]",
          "publisher": "[variables('imagePublisher')]"
       },
+      "isGen2": "[or(not(variables('hasGenChoice')), equals(parameters('vmGeneration'), 'Gen 2'))]",
+      "trustedLaunchSecurityProfile": {
+         "securityType": "TrustedLaunch",
+         "uefiSettings": {
+            "secureBootEnabled": true,
+            "vTpmEnabled": true
+         }
+      },
+      "securityProfile": "[if(variables('isGen2'), variables('trustedLaunchSecurityProfile'), json('null'))]",
       "sqlserverName": "[concat(variables('namingInfix'), 'sqlserver')]",
       "q": "'",
       "isAgPublicIPNew": "[equals(parameters('agpublicIpNewOrExisting'), 'new')]",
@@ -897,6 +906,7 @@
                   },
                   "imageReference": "[variables('imageReference')]"
                },
+               "securityProfile": "[variables('securityProfile')]",
                "osProfile": {
                   "computerNamePrefix": "[variables('dbvmssName')]",
                   "adminUsername": "[parameters('adminUsername')]",
@@ -995,6 +1005,7 @@
                   },
                   "imageReference": "[variables('imageReference')]"
                },
+               "securityProfile": "[variables('securityProfile')]",
                "osProfile": {
                   "computerNamePrefix": "[variables('namingInfix')]",
                   "adminUsername": "[parameters('adminUsername')]",

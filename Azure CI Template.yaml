@@ -181,10 +181,7 @@ jobs:
       Inline: |
         Install-Module -Name Az.Compute -AllowClobber -Force
 
-        # $VersionText should be incremented to be the value of the NEXT image version published.
-        # But here we need a published version, so subtract one from the current version number to get the last published version.
-
-        $SkuName = "w22d-15-0-$($(VersionText)-1)"
+        $SkuName = "w22d-15-0-$(PublishedVersionText)"
         $var=ConvertFrom-Json '$(deploymentOutput)'
 
         # Download TestImageVersion PS Script

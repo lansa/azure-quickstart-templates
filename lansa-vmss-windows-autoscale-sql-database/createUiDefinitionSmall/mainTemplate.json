@@ -21,7 +21,7 @@
          ],
          "defaultValue": "Windows Server 2025",
          "metadata": {
-            "description": "Choose the Windows Server image version to use. Windows Server 2025 is Gen 2 only. Windows Server 2022 and 2019 support Gen 1 and Gen 2."
+            "description": "Choose the Windows Server image version to use. Windows Server 2025 and 2019 are Gen 2 only. Windows Server 2022 supports Gen 1 and Gen 2."
          }
       },
       "vmGeneration": {
@@ -589,12 +589,10 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "Gen 1": { "sku": "w19d-15-0" },
-                  "Gen 2": { "sku": "w19d-15-0-g2" }
+                  "sku": "w19d-15-0-g2"
                },
                "V16 GA": {
-                  "Gen 1": { "sku": "w19d-16-0" },
-                  "Gen 2": { "sku": "w19d-16-0-g2" }
+                  "sku": "w19d-16-0-g2"
                }
             }
          },
@@ -602,18 +600,16 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "Gen 1": { "sku": "w19d-15-0j" },
-                  "Gen 2": { "sku": "w19d-15-0j-g2" }
+                  "sku": "w19d-15-0j-g2"
                },
                "V16 GA": {
-                  "Gen 1": { "sku": "w19d-16-0j" },
-                  "Gen 2": { "sku": "w19d-16-0j-g2" }
+                  "sku": "w19d-16-0j-g2"
                }
             }
          }
       },
       "imagePublisher": "lansa",
-      "hasGenChoice": "[or(contains(parameters('osName'), '2022'), contains(parameters('osName'), '2019'))]",
+      "hasGenChoice": "[contains(parameters('osName'), '2022')]",
       "imageSku": "[if(variables('hasGenChoice'), variables('marketplaceSettings')[parameters('osName')].version[parameters('lansaVersion')][parameters('vmGeneration')].sku, variables('marketplaceSettings')[parameters('osName')].version[parameters('lansaVersion')].sku)]",
       "imageOfferName": "[concat(variables('marketplaceSettings')[parameters('osName')].offer, if (variables('isPreview'), '-preview', ''))]",
       "osType": {

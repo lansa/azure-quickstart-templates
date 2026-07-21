@@ -72,7 +72,7 @@
                "name": "osName",
                "type": "Microsoft.Common.DropDown",
                "label": "OS Name",
-               "toolTip": "Choose the Windows Server image version to use. Windows Server 2025 is Gen 2 only. Windows Server 2022 and 2019 support Gen 1 and Gen 2 (selectable below).",
+               "toolTip": "Choose the Windows Server image version to use. Windows Server 2025 and 2019 are Gen 2 only. Windows Server 2022 supports Gen 1 and Gen 2 (selectable below).",
                "defaultValue": "Windows Server 2025",
                "constraints": {
                    "required": true,
@@ -108,9 +108,9 @@
                "name": "vmGeneration",
                "type": "Microsoft.Common.DropDown",
                "label": "VM Generation",
-               "toolTip": "Gen 2 supports Trusted Launch (Secure Boot, vTPM). Only Gen 2 images are being updated. Windows Server 2022 and 2019 may be Gen 1 or Gen 2. Windows Server 2025 is Gen 2 only.",
+               "toolTip": "Gen 2 supports Trusted Launch (Secure Boot, vTPM). Only Gen 2 images are being updated. Windows Server 2022 may be Gen 1 or Gen 2. Windows Server 2025 and 2019 are Gen 2 only.",
                "defaultValue": "Gen 2",
-               "visible": "[or(contains(basics('osName'), '2022'), contains(basics('osName'), '2019'))]",
+               "visible": "[contains(basics('osName'), '2022')]",
                "constraints": {
                    "required": true,
                    "allowedValues":[

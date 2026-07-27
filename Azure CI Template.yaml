@@ -150,6 +150,7 @@ jobs:
         $failureCount = 0
         forEach($url in $urls) {
             try{
+                Write-Host "Trying $url"
                 $response = Invoke-WebRequest -Uri $url -TimeoutSec 14 -UseBasicParsing
                 $ResponseCode = $response.StatusCode
                 if($ResponseCode -ne 200) {

@@ -541,10 +541,10 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w25d-15-0-g2"
+                  "sku": "w25d-15-0"
                },
                "V16 GA": {
-                  "sku": "w25d-16-0-g2"
+                  "sku": "w25d-16-0"
                }
             }
          },
@@ -552,10 +552,10 @@
             "offer": "lansa-scalable-license",
             "version": {
                "V15 GA": {
-                  "sku": "w25d-15-0j-g2"
+                  "sku": "w25d-15-0j"
                },
                "V16 GA": {
-                  "sku": "w25d-16-0j-g2"
+                  "sku": "w25d-16-0j"
                }
             }
          },

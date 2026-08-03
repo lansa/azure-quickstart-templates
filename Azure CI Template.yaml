@@ -26,7 +26,7 @@ jobs:
 - job: Job_1
   displayName: 'Agent job: Template Tests'
   pool:
-    vmImage: windows-2022
+    name: default
 
   steps:
   - checkout: self

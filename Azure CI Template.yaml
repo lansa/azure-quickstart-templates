@@ -1,4 +1,4 @@
-name: CI-Templates-$(Build.BuildId)
+name: Az-CI-Templates-$(Build.BuildId)
 
 variables:
 - group: 'Template Parameters'

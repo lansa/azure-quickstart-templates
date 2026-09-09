@@ -180,7 +180,15 @@ jobs:
       ConnectedServiceNameARM: $(ConnectedServiceName)
       ScriptType: InlineScript
       Inline: |
-        Install-Module -Name Az.Compute -AllowClobber -Force
+        # Do NOT unconditionally Install-Module here. The AzurePowerShell task has
+        # already imported the agent's Az.Accounts into this process; pulling a newer
+        # Az.Compute drags in a newer Az.Accounts and the two assembly versions cannot
+        # coexist in one AppDomain -> "Unable to load one or more of the requested types"
+        # -> CouldNotAutoloadMatchingModule on Invoke-AzVmssVMRunCommand.
+        # Only install when the module is genuinely missing from the agent.
+        if (-not (Get-Module -ListAvailable -Name Az.Compute)) {
+            Install-Module -Name Az.Compute -AllowClobber -Force -Scope AllUsers
+        }
 
         $SkuName = "w22d-15-0-$(PublishedVersionText)"
         $var=ConvertFrom-Json '$(deploymentOutput)'

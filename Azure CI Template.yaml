@@ -36,14 +36,20 @@ jobs:
     inputs:
       targetType: inline
       script: |
-        New-Item -Path $(ttk.folder) -ItemType Directory -verbose
+        # Start from a clean folder - the agent workspace persists between runs
+        if (Test-Path "$(ttk.folder)") {
+            Write-Host "Removing previous contents of $(ttk.folder)"
+            Remove-Item -Path "$(ttk.folder)" -Recurse -Force
+        }
+        New-Item -Path $(ttk.folder) -ItemType Directory -Force -verbose
+
         Invoke-WebRequest -Uri "https://aka.ms/arm-ttk-marketplace" -OutFile "$(ttk.folder)\$(ttk.asset.filename)" -verbose -UseBasicParsing
 
         # Expand the TTK files
         Get-ChildItem "$(ttk.folder)" -Recurse
 
         Write-Host "Expanding files..."
-        Expand-Archive -Path "$(ttk.folder)\*.zip" -DestinationPath "$(ttk.folder)" -Verbose
+        Expand-Archive -Path "$(ttk.folder)\$(ttk.asset.filename)" -DestinationPath "$(ttk.folder)" -Force -Verbose
 
         Write-Host "Expanded files found:"
         Get-ChildItem "$(ttk.folder)" -Recurse

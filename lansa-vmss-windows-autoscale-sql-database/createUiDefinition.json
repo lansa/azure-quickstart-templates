@@ -124,7 +124,7 @@
                "label": "App Virtual machine size",
                "toolTip": "The size of virtual machine to provision.",
                "recommendedSizes": [
-                   "Standard_B4ms"
+                   "Standard_B4s_v2"
                ],
                "imageReference": {
                    "publisher": "lansa",
@@ -140,7 +140,7 @@
                "label": "DB Admin Virtual machine size",
                "toolTip": "Size of the Virtual Machine which manages the database.",
                "recommendedSizes": [
-                   "Standard_B2ms"
+                   "Standard_B2s_v2"
                ],
                "imageReference": {
                    "publisher": "lansa",

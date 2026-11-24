@@ -110,7 +110,7 @@
             ]
         },
         "virtualMachineSize": {
-            "value": "Standard_B8ms"
+            "value": "Standard_B8s_v2"
         },
         "adminUsername": {
             "value": "lansa"

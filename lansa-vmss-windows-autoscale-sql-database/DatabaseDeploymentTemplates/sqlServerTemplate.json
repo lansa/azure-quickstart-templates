@@ -123,6 +123,9 @@
         "tempDbPath": {
             "type": "string"
         },
+        "tempDbDisksLUNs": {
+            "type": "array"
+        },
         "rServicesEnabled": {
             "type": "string"
         }
@@ -322,6 +325,7 @@
                         "DefaultFilePath": "[parameters('logPath')]"
                     },
                     "SQLTempDbSettings": {
+                        "LUNs": "[parameters('tempDbDisksLUNs')]",
                         "DefaultFilePath": "[parameters('tempDbPath')]"
                     }
                 },

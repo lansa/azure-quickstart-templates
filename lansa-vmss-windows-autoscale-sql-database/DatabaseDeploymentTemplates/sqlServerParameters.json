@@ -179,6 +179,11 @@
         "tempDbPath": {
             "value": "F:\\tempDb"
         },
+        "tempDbDisksLUNs": {
+            "value": [
+                0
+            ]
+        },
         "rServicesEnabled": {
             "value": "false"
         }
